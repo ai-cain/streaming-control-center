@@ -29,6 +29,13 @@ and recorder API operations.
 
 ![Settings](docs/img/06_settings.png)
 
+## Documentation
+
+- [Docs index](docs/README.md)
+- [Architecture](docs/architecture.md)
+- [Modules](docs/modules.md)
+- [API integration](docs/api-integration.md)
+
 ## Current State
 
 This repository now has a React + Vite shell shaped like a monitoring client:
