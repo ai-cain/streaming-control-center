@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useRecorderHealthQuery, useRecordingStatusQuery } from '../../shared/api/queries'
 import { getCameraById } from '../../shared/camera-catalog'
 import { describeConnectionMode } from '../config/connection-mode'
 import { useConfig } from '../config/config-context'
 import { buildEndpointCatalog, pickEndpoints } from '../config/endpoints'
+import { useUiPreferences } from '../ui-preferences/ui-preferences-context'
 import { CameraSlot } from './CameraSlot'
 import { CameraStrip } from './CameraStrip'
 
@@ -37,13 +38,14 @@ function LayoutIcon({ size }: { size: LayoutSize }) {
 }
 
 export function LivePage() {
+  const { t } = useUiPreferences()
   const [layout, setLayout] = useState<LayoutSize>(1)
   const [slotCameraIds, setSlotCameraIds] = useState<(string | null)[]>([null])
   const { config } = useConfig()
   const healthQuery = useRecorderHealthQuery(config.apiBase, config.pollingMs)
   const statusQuery = useRecordingStatusQuery(config.apiBase, config.pollingMs)
   const connectionMode = describeConnectionMode(config)
-  const activeCameras = (statusQuery.data ?? []).filter((c) => c.is_running).length
+  const activeCameras = (statusQuery.data ?? []).filter((camera) => camera.is_running).length
 
   const endpoints = pickEndpoints(buildEndpointCatalog(config), [
     'live-manifest',
@@ -56,7 +58,7 @@ export function LivePage() {
   const changeLayout = (next: LayoutSize) => {
     setLayout(next)
     setSlotCameraIds((prev) =>
-      Array.from({ length: next }, (_, i) => prev[i] ?? null),
+      Array.from({ length: next }, (_, index) => prev[index] ?? null),
     )
   }
 
@@ -65,19 +67,21 @@ export function LivePage() {
       if (prev.includes(cameraId)) {
         return prev.map((id) => (id === cameraId ? null : id))
       }
+
       const emptyIndex = prev.indexOf(null)
+
       if (emptyIndex !== -1) {
         const next = [...prev]
         next[emptyIndex] = cameraId
         return next
       }
-      // All slots full — replace the first
+
       return [cameraId, ...prev.slice(1)]
     })
   }
 
   const removeFromSlot = (index: number) => {
-    setSlotCameraIds((prev) => prev.map((id, i) => (i === index ? null : id)))
+    setSlotCameraIds((prev) => prev.map((id, slotIndex) => (slotIndex === index ? null : id)))
   }
 
   return (
@@ -85,9 +89,9 @@ export function LivePage() {
       <div className="live-toolbar">
         <div className="live-toolbar-left">
           <div className="mode-switch">
-            <span className="mode-tab active">Live View</span>
+            <span className="mode-tab active">{t('live.mode.liveView')}</span>
             <Link className="mode-tab" to="/playback">
-              Playback
+              {t('live.mode.playback')}
             </Link>
           </div>
           <div className="layout-picker">
@@ -96,7 +100,13 @@ export function LivePage() {
                 className={`layout-btn${layout === size ? ' active' : ''}`}
                 key={size}
                 onClick={() => changeLayout(size)}
-                title={size === 4 ? '2×2' : size === 2 ? '1×2' : '1×1'}
+                title={
+                  size === 4
+                    ? t('live.layout.2x2')
+                    : size === 2
+                      ? t('live.layout.1x2')
+                      : t('live.layout.1x1')
+                }
                 type="button"
               >
                 <LayoutIcon size={size} />
@@ -107,10 +117,10 @@ export function LivePage() {
 
         <div className="live-toolbar-right">
           <span className={`pill ${healthQuery.isError ? 'danger' : 'accent'}`}>
-            {healthQuery.isError ? 'signal issue' : 'live'}
+            {healthQuery.isError ? t('live.pill.signalIssue') : t('live.pill.live')}
           </span>
           <Link className="toolbar-link" to="/config">
-            Settings
+            {t('live.settings')}
           </Link>
         </div>
       </div>
@@ -131,33 +141,36 @@ export function LivePage() {
 
       <div className="live-status-bar">
         <div className="footer-cell">
-          <span>Workers</span>
+          <span>{t('live.footer.workers')}</span>
           <strong>{healthQuery.data?.workers ?? '--'}</strong>
         </div>
         <div className="footer-cell">
-          <span>Active cameras</span>
+          <span>{t('live.footer.activeCameras')}</span>
           <strong>{config.apiBase ? activeCameras : '--'}</strong>
         </div>
         <div className="footer-cell">
-          <span>Mode</span>
-          <strong>{connectionMode.mode}</strong>
+          <span>{t('live.footer.mode')}</span>
+          <strong>{t(connectionMode.modeKey)}</strong>
         </div>
         <div className="footer-cell">
-          <span>In grid</span>
+          <span>{t('live.footer.inGrid')}</span>
           <strong>
-            {activeCameraIds.length} / {layout}
+            {t('live.footer.gridUsage', {
+              count: activeCameraIds.length,
+              layout,
+            })}
           </strong>
         </div>
       </div>
 
       <div className="workspace-grid">
         <section className="panel compact-panel">
-          <span className="section-title">Live Endpoints</span>
+          <span className="section-title">{t('live.endpoints.title')}</span>
           <div className="endpoint-list">
             {endpoints.map((endpoint) => (
               <div className="endpoint-row compact-endpoint" key={endpoint.id}>
                 <div className="endpoint-body">
-                  <strong>{endpoint.label}</strong>
+                  <strong>{t(endpoint.labelKey)}</strong>
                   <code>{endpoint.url}</code>
                 </div>
                 <span className={`endpoint-method ${endpoint.method.toLowerCase()}`}>
@@ -170,8 +183,8 @@ export function LivePage() {
 
         <aside className="side-stack">
           <section className={`signal-box ${connectionMode.tone}`}>
-            <span className="signal-label">{connectionMode.mode}</span>
-            <p>{connectionMode.note}</p>
+            <span className="signal-label">{t(connectionMode.modeKey)}</span>
+            <p>{t(connectionMode.noteKey)}</p>
           </section>
         </aside>
       </div>

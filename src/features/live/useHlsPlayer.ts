@@ -1,10 +1,12 @@
 import { useEffect, useState, type RefObject } from 'react'
+import type { TranslationKey } from '../../shared/i18n/messages'
 
 type PlayerStatus = 'idle' | 'loading' | 'playing' | 'unsupported' | 'error'
 
 interface HlsPlayerState {
+  fallbackMessage?: string
+  messageKey: TranslationKey
   status: PlayerStatus
-  message: string
 }
 
 export function useHlsPlayer(
@@ -13,8 +15,8 @@ export function useHlsPlayer(
   enabled: boolean,
 ): HlsPlayerState {
   const [playerState, setPlayerState] = useState<HlsPlayerState>({
+    messageKey: 'live.hls.idle',
     status: 'idle',
-    message: 'Add media base, app, and stream key to start live playback.',
   })
 
   useEffect(() => {
@@ -33,8 +35,8 @@ export function useHlsPlayer(
     if (!enabled || !manifestUrl) {
       resetVideoElement()
       setPlayerState({
+        messageKey: 'live.hls.idle',
         status: 'idle',
-        message: 'Add media base, app, and stream key to start live playback.',
       })
       return
     }
@@ -43,8 +45,8 @@ export function useHlsPlayer(
     let destroyPlayback: (() => void) | null = null
 
     setPlayerState({
+      messageKey: 'live.hls.loadingManifest',
       status: 'loading',
-      message: 'Loading HLS manifest...',
     })
 
     if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
@@ -52,16 +54,16 @@ export function useHlsPlayer(
       videoElement.play().catch(() => {
         if (!isDisposed) {
           setPlayerState({
+            messageKey: 'live.hls.manifestLoaded',
             status: 'loading',
-            message: 'Manifest loaded. Press play if autoplay is blocked.',
           })
         }
       })
 
       if (!isDisposed) {
         setPlayerState({
+          messageKey: 'live.hls.playingNative',
           status: 'playing',
-          message: 'Live playback is using native HLS support.',
         })
       }
 
@@ -77,8 +79,8 @@ export function useHlsPlayer(
 
           if (!Hls.isSupported()) {
             setPlayerState({
+              messageKey: 'live.hls.unsupported',
               status: 'unsupported',
-              message: 'This browser does not support HLS playback.',
             })
             return
           }
@@ -98,16 +100,16 @@ export function useHlsPlayer(
             videoElement.play().catch(() => {
               if (!isDisposed) {
                 setPlayerState({
+                  messageKey: 'live.hls.manifestLoaded',
                   status: 'loading',
-                  message: 'Manifest loaded. Press play if autoplay is blocked.',
                 })
               }
             })
 
             if (!isDisposed) {
               setPlayerState({
+                messageKey: 'live.hls.playingHlsJs',
                 status: 'playing',
-                message: 'Live playback is running through hls.js.',
               })
             }
           })
@@ -118,16 +120,17 @@ export function useHlsPlayer(
             }
 
             setPlayerState({
+              fallbackMessage: data.details || undefined,
+              messageKey: 'live.hls.fatalError',
               status: 'error',
-              message: data.details || 'The browser hit a fatal HLS playback error.',
             })
           })
         })
         .catch(() => {
           if (!isDisposed) {
             setPlayerState({
+              messageKey: 'live.hls.runtimeLoadError',
               status: 'error',
-              message: 'The hls.js runtime could not be loaded.',
             })
           }
         })

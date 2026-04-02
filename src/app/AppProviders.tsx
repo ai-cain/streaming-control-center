@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { ConfigProvider } from '../features/config/config-context'
+import { UiPreferencesProvider } from '../features/ui-preferences/ui-preferences-context'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +19,9 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ConfigProvider>{children}</ConfigProvider>
+      <ConfigProvider>
+        <UiPreferencesProvider>{children}</UiPreferencesProvider>
+      </ConfigProvider>
     </QueryClientProvider>
   )
 }

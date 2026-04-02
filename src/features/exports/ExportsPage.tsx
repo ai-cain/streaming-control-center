@@ -1,26 +1,28 @@
 import { useConfig } from '../config/config-context'
 import { buildEndpointCatalog, pickEndpoints } from '../config/endpoints'
+import { useUiPreferences } from '../ui-preferences/ui-preferences-context'
 import { FeatureBlueprintPage } from '../../shared/FeatureBlueprintPage'
 
 export function ExportsPage() {
   const { config } = useConfig()
+  const { t } = useUiPreferences()
 
   return (
     <FeatureBlueprintPage
-      description="Exports are a perfect POST-plus-polling feature. The UI should feel like a job console, not a single button that fires blind requests."
-      direction="Use a create-job action followed by a job list that refreshes until downloads are ready."
+      description={t('exports.description')}
+      direction={t('exports.direction')}
       endpoints={pickEndpoints(buildEndpointCatalog(config), [
         'exports-create',
         'exports-list',
       ])}
-      eyebrow="Export plan"
+      eyebrow={t('exports.eyebrow')}
       requestShape={`POST /api/recording/export\nGET /api/recording/export`}
       status="neutral"
-      title="Exports become a background jobs surface"
+      title={t('exports.title')}
       workstreams={[
-        'Build a typed export request payload.',
-        'Poll job status and display progress history.',
-        'Expose download readiness clearly when the output file exists.',
+        t('exports.workstream.1'),
+        t('exports.workstream.2'),
+        t('exports.workstream.3'),
       ]}
     />
   )

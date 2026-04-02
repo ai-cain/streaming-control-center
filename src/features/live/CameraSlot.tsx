@@ -1,7 +1,13 @@
 import { useRef } from 'react'
-import { resolveCameraStreamKey, type CameraOption } from '../../shared/camera-catalog'
+import {
+  getCameraShortLabel,
+  getCameraStageLabel,
+  resolveCameraStreamKey,
+  type CameraOption,
+} from '../../shared/camera-catalog'
 import type { AppConfig } from '../config/config.types'
 import { buildLiveManifestUrl } from '../config/endpoints'
+import { useUiPreferences } from '../ui-preferences/ui-preferences-context'
 import { useHlsPlayer } from './useHlsPlayer'
 
 interface CameraSlotProps {
@@ -11,7 +17,13 @@ interface CameraSlotProps {
   slotIndex: number
 }
 
-export function CameraSlot({ camera, config, onRemove, slotIndex }: CameraSlotProps) {
+export function CameraSlot({
+  camera,
+  config,
+  onRemove,
+  slotIndex,
+}: CameraSlotProps) {
+  const { t } = useUiPreferences()
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const streamKey = camera ? resolveCameraStreamKey(config.streamKey, camera) : ''
@@ -24,22 +36,23 @@ export function CameraSlot({ camera, config, onRemove, slotIndex }: CameraSlotPr
     return (
       <div className="camera-slot slot-empty">
         <span className="slot-placeholder-num">{slotIndex + 1}</span>
-        <span className="slot-placeholder-hint">Select a camera below</span>
+        <span className="slot-placeholder-hint">{t('live.slot.selectCamera')}</span>
       </div>
     )
   }
 
+  const cameraShortLabel = getCameraShortLabel(camera, t)
+  const cameraStageLabel = getCameraStageLabel(camera, t)
+  const playerMessage = playerState.fallbackMessage ?? t(playerState.messageKey)
+
   return (
     <div className="camera-slot">
       <div className="slot-header">
-        <span className="slot-label">{camera.shortLabel}</span>
+        <span className="slot-label">{cameraShortLabel}</span>
         <div className="slot-header-meta">
-          <span
-            className={`slot-status-dot ${playerState.status}`}
-            title={playerState.message}
-          />
+          <span className={`slot-status-dot ${playerState.status}`} title={playerMessage} />
           <button
-            aria-label={`Remove ${camera.shortLabel}`}
+            aria-label={t('live.slot.removeCamera', { camera: cameraShortLabel })}
             className="slot-remove-btn"
             onClick={onRemove}
             type="button"
@@ -52,7 +65,7 @@ export function CameraSlot({ camera, config, onRemove, slotIndex }: CameraSlotPr
         {enabled ? (
           <video autoPlay controls muted playsInline ref={videoRef} />
         ) : (
-          <div className="slot-no-config">{camera.stageLabel}</div>
+          <div className="slot-no-config">{cameraStageLabel}</div>
         )}
       </div>
     </div>

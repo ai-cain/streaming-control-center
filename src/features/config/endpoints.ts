@@ -1,9 +1,10 @@
 import { joinUrl } from '../../shared/utils/url'
+import type { TranslationKey } from '../../shared/i18n/messages'
 import type { AppConfig } from './config.types'
 
 export interface EndpointDefinition {
   id: string
-  label: string
+  labelKey: TranslationKey
   method: 'GET' | 'POST'
   url: string
 }
@@ -24,26 +25,26 @@ export function buildEndpointCatalog(config: AppConfig): EndpointDefinition[] {
   return [
     {
       id: 'live-manifest',
-      label: 'Live HLS manifest',
+      labelKey: 'endpoint.liveManifest',
       method: 'GET',
       url:
         buildLiveManifestUrl(config) || '/{mediaBase}/{app}/{streamKey}/index.m3u8',
     },
     {
       id: 'health',
-      label: 'Recorder health',
+      labelKey: 'endpoint.health',
       method: 'GET',
       url: previewApiUrl(config.apiBase, '/api/recording/health'),
     },
     {
       id: 'status',
-      label: 'Recording status',
+      labelKey: 'endpoint.status',
       method: 'GET',
       url: previewApiUrl(config.apiBase, '/api/recording/status'),
     },
     {
       id: 'playback',
-      label: 'Playback range',
+      labelKey: 'endpoint.playback',
       method: 'GET',
       url: previewApiUrl(
         config.apiBase,
@@ -52,7 +53,7 @@ export function buildEndpointCatalog(config: AppConfig): EndpointDefinition[] {
     },
     {
       id: 'available',
-      label: 'Playback availability',
+      labelKey: 'endpoint.available',
       method: 'GET',
       url: previewApiUrl(
         config.apiBase,
@@ -61,19 +62,19 @@ export function buildEndpointCatalog(config: AppConfig): EndpointDefinition[] {
     },
     {
       id: 'exports-create',
-      label: 'Create export job',
+      labelKey: 'endpoint.exportsCreate',
       method: 'POST',
       url: previewApiUrl(config.apiBase, '/api/recording/export'),
     },
     {
       id: 'exports-list',
-      label: 'List export jobs',
+      labelKey: 'endpoint.exportsList',
       method: 'GET',
       url: previewApiUrl(config.apiBase, '/api/recording/export'),
     },
     {
       id: 'snapshot-latest',
-      label: 'Latest snapshot',
+      labelKey: 'endpoint.snapshotLatest',
       method: 'GET',
       url: previewApiUrl(
         config.apiBase,
@@ -82,7 +83,7 @@ export function buildEndpointCatalog(config: AppConfig): EndpointDefinition[] {
     },
     {
       id: 'snapshot-history',
-      label: 'Snapshot history',
+      labelKey: 'endpoint.snapshotHistory',
       method: 'GET',
       url: previewApiUrl(
         config.apiBase,

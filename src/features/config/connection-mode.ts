@@ -1,9 +1,10 @@
+import type { TranslationKey } from '../../shared/i18n/messages'
 import { hostnameFromUrl } from '../../shared/utils/url'
 import type { AppConfig } from './config.types'
 
 export interface ConnectionModeInfo {
-  mode: string
-  note: string
+  modeKey: TranslationKey
+  noteKey: TranslationKey
   tone: 'neutral' | 'warning' | 'danger' | 'success'
 }
 
@@ -41,8 +42,8 @@ function usesInsecureHttp(baseUrl: string) {
 export function describeConnectionMode(config: AppConfig): ConnectionModeInfo {
   if (!config.apiBase && !config.mediaBase) {
     return {
-      mode: 'pending',
-      note: 'Set the recorder API and media origin first. The new app intentionally avoids dead default links.',
+      modeKey: 'connection.mode.pending',
+      noteKey: 'connection.note.pending',
       tone: 'neutral',
     }
   }
@@ -56,39 +57,39 @@ export function describeConnectionMode(config: AppConfig): ConnectionModeInfo {
     (usesInsecureHttp(config.apiBase) || usesInsecureHttp(config.mediaBase))
   ) {
     return {
-      mode: 'mixed content',
-      note: 'The UI is running on HTTPS while one or more targets still use HTTP. Browsers may block fetches, snapshots, or HLS playback.',
+      modeKey: 'connection.mode.mixedContent',
+      noteKey: 'connection.note.mixedContent',
       tone: 'danger',
     }
   }
 
   if (isLocalHost(apiHost) && isLocalHost(mediaHost)) {
     return {
-      mode: 'local only',
-      note: 'Everything points to localhost. Great for development, but only this machine can reach the services unless a proxy is added.',
+      modeKey: 'connection.mode.localOnly',
+      noteKey: 'connection.note.localOnly',
       tone: 'success',
     }
   }
 
   if (isPrivateIp(apiHost) || isPrivateIp(mediaHost)) {
     return {
-      mode: 'private LAN',
-      note: 'The stack is on a private address range. Access depends on LAN or VPN reachability.',
+      modeKey: 'connection.mode.privateLan',
+      noteKey: 'connection.note.privateLan',
       tone: 'warning',
     }
   }
 
   if (isPublicIp(apiHost) || isPublicIp(mediaHost)) {
     return {
-      mode: 'public edge',
-      note: 'The stack points to a public IP. Add authentication and network controls if recorder endpoints are reachable from the internet.',
+      modeKey: 'connection.mode.publicEdge',
+      noteKey: 'connection.note.publicEdge',
       tone: 'danger',
     }
   }
 
   return {
-    mode: 'custom',
-    note: 'Custom hostnames are in play. Validate DNS, TLS, CORS, and firewall rules as part of rollout.',
+    modeKey: 'connection.mode.custom',
+    noteKey: 'connection.note.custom',
     tone: 'neutral',
   }
 }

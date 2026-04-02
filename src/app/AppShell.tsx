@@ -6,18 +6,20 @@ import { LivePage } from '../features/live/LivePage'
 import { OverviewPage } from '../features/overview/OverviewPage'
 import { PlaybackPage } from '../features/playback/PlaybackPage'
 import { SnapshotsPage } from '../features/snapshots/SnapshotsPage'
+import { useUiPreferences } from '../features/ui-preferences/ui-preferences-context'
 
 const navItems = [
-  { to: '/', label: 'Workspace' },
-  { to: '/live', label: 'Live' },
-  { to: '/playback', label: 'Playback' },
-  { to: '/exports', label: 'Exports' },
-  { to: '/snapshots', label: 'Snapshots' },
-  { to: '/config', label: 'Settings' },
+  { to: '/', labelKey: 'nav.workspace' },
+  { to: '/live', labelKey: 'nav.live' },
+  { to: '/playback', labelKey: 'nav.playback' },
+  { to: '/exports', labelKey: 'nav.exports' },
+  { to: '/snapshots', labelKey: 'nav.snapshots' },
+  { to: '/config', labelKey: 'nav.settings' },
 ] as const
 
 export function AppShell() {
   const { hasApiConfig, hasLiveConfig } = useConfig()
+  const { locale, localeOptions, setLocale, t } = useUiPreferences()
 
   return (
     <div className="shell">
@@ -28,11 +30,11 @@ export function AppShell() {
           </span>
           <div className="shell-brand-copy">
             <strong>Streaming Control Center</strong>
-            <small>Operator console</small>
+            <small>{t('shell.operatorConsole')}</small>
           </div>
         </div>
 
-        <nav className="shell-tabs" aria-label="Primary navigation">
+        <nav className="shell-tabs" aria-label={t('shell.primaryNavigation')}>
           {navItems.map((item) => (
             <NavLink
               className={({ isActive }) =>
@@ -42,18 +44,35 @@ export function AppShell() {
               key={item.to}
               to={item.to}
             >
-              {item.label}
+              {t(item.labelKey)}
             </NavLink>
           ))}
         </nav>
 
         <div className="shell-status">
           <span className={`status-pill ${hasApiConfig ? 'success' : 'warning'}`}>
-            API {hasApiConfig ? 'ready' : 'pending'}
+            {hasApiConfig
+              ? t('shell.status.api.ready')
+              : t('shell.status.api.pending')}
           </span>
           <span className={`status-pill ${hasLiveConfig ? 'success' : 'warning'}`}>
-            Live {hasLiveConfig ? 'ready' : 'incomplete'}
+            {hasLiveConfig
+              ? t('shell.status.live.ready')
+              : t('shell.status.live.incomplete')}
           </span>
+          <label className="shell-locale">
+            <span>{t('shell.locale.label')}</span>
+            <select
+              onChange={(event) => setLocale(event.target.value as typeof locale)}
+              value={locale}
+            >
+              {localeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </header>
 

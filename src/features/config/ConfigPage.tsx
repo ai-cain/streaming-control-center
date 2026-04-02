@@ -1,4 +1,5 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
+import { useUiPreferences } from '../ui-preferences/ui-preferences-context'
 import { safeOrigin } from '../../shared/utils/url'
 import { describeConnectionMode } from './connection-mode'
 import { sanitizeConfig, useConfig } from './config-context'
@@ -7,11 +8,13 @@ import { defaultConfig, type AppConfig } from './config.types'
 
 export function ConfigPage() {
   const { config, replaceConfig, resetConfig } = useConfig()
+  const { t } = useUiPreferences()
   const [draft, setDraft] = useState<AppConfig>(config)
   const previewConfig = sanitizeConfig(draft)
   const connectionMode = describeConnectionMode(previewConfig)
   const endpointCatalog = buildEndpointCatalog(previewConfig)
-  const liveManifestUrl = buildLiveManifestUrl(previewConfig) || 'Not ready yet'
+  const liveManifestUrl =
+    buildLiveManifestUrl(previewConfig) || t('config.preview.notReadyYet')
 
   useEffect(() => {
     setDraft(config)
@@ -41,37 +44,34 @@ export function ConfigPage() {
     <div className="page-shell">
       <section className="page-banner compact">
         <div>
-          <span className="section-title">Settings</span>
-          <h2>Connection workspace</h2>
-          <p>
-            Configure recorder API, media origin, stream target, and polling. This
-            page stays accessible because the app is mainly GET and POST driven.
-          </p>
+          <span className="section-title">{t('config.sectionTitle')}</span>
+          <h2>{t('config.title')}</h2>
+          <p>{t('config.description')}</p>
         </div>
 
         <div className={`signal-box ${connectionMode.tone}`}>
-          <span className="signal-label">{connectionMode.mode}</span>
-          <p>{connectionMode.note}</p>
+          <span className="signal-label">{t(connectionMode.modeKey)}</span>
+          <p>{t(connectionMode.noteKey)}</p>
         </div>
       </section>
 
       <section className="settings-grid">
         <article className="panel settings-card">
-          <span className="section-title">Network</span>
+          <span className="section-title">{t('config.network.title')}</span>
           <label className="form-row">
-            <span>Recorder API</span>
+            <span>{t('config.network.apiBase.label')}</span>
             <input
               onChange={handleTextField('apiBase')}
-              placeholder="http://host:7000"
+              placeholder={t('config.network.apiBase.placeholder')}
               spellCheck="false"
               value={draft.apiBase}
             />
           </label>
           <label className="form-row">
-            <span>Media origin</span>
+            <span>{t('config.network.mediaBase.label')}</span>
             <input
               onChange={handleTextField('mediaBase')}
-              placeholder="http://host:8000"
+              placeholder={t('config.network.mediaBase.placeholder')}
               spellCheck="false"
               value={draft.mediaBase}
             />
@@ -79,31 +79,28 @@ export function ConfigPage() {
         </article>
 
         <article className="panel settings-card">
-          <span className="section-title">Stream</span>
+          <span className="section-title">{t('config.stream.title')}</span>
           <label className="form-row">
-            <span>Application</span>
+            <span>{t('config.stream.app.label')}</span>
             <input
               onChange={handleTextField('app')}
-              placeholder="main"
+              placeholder={t('config.stream.app.placeholder')}
               spellCheck="false"
               value={draft.app}
             />
           </label>
           <label className="form-row">
-            <span>Stream key template</span>
+            <span>{t('config.stream.streamKey.label')}</span>
             <input
               onChange={handleTextField('streamKey')}
-              placeholder="camera_{id} or camera_01"
+              placeholder={t('config.stream.streamKey.placeholder')}
               spellCheck="false"
               value={draft.streamKey}
             />
-            <small className="field-note">
-              Leave it blank to use the built-in camera mapping, or use {'{id}'} to
-              switch per selected camera.
-            </small>
+            <small className="field-note">{t('config.stream.streamKey.help')}</small>
           </label>
           <label className="form-row">
-            <span>Polling</span>
+            <span>{t('config.stream.polling.label')}</span>
             <input
               min={3000}
               onChange={handlePollingField}
@@ -119,7 +116,7 @@ export function ConfigPage() {
               onClick={() => replaceConfig(previewConfig)}
               type="button"
             >
-              Save settings
+              {t('config.actions.save')}
             </button>
             <button
               className="button secondary"
@@ -129,7 +126,7 @@ export function ConfigPage() {
               }}
               type="button"
             >
-              Reset
+              {t('config.actions.reset')}
             </button>
           </div>
         </article>
@@ -137,22 +134,26 @@ export function ConfigPage() {
 
       <div className="workspace-grid">
         <section className="panel compact-panel">
-          <span className="section-title">Current Preview</span>
+          <span className="section-title">{t('config.preview.title')}</span>
           <div className="detail-list">
             <div className="detail-row">
-              <span className="muted">Recorder API</span>
-              <code>{previewConfig.apiBase || 'Not configured'}</code>
+              <span className="muted">{t('config.preview.apiBase')}</span>
+              <code>
+                {previewConfig.apiBase || t('config.preview.notConfigured')}
+              </code>
             </div>
             <div className="detail-row">
-              <span className="muted">Media origin</span>
-              <code>{previewConfig.mediaBase || 'Not configured'}</code>
+              <span className="muted">{t('config.preview.mediaBase')}</span>
+              <code>
+                {previewConfig.mediaBase || t('config.preview.notConfigured')}
+              </code>
             </div>
             <div className="detail-row">
-              <span className="muted">Live manifest</span>
+              <span className="muted">{t('config.preview.liveManifest')}</span>
               <code>{liveManifestUrl}</code>
             </div>
             <div className="detail-row">
-              <span className="muted">Browser origin</span>
+              <span className="muted">{t('config.preview.browserOrigin')}</span>
               <code>{safeOrigin()}</code>
             </div>
           </div>
@@ -160,12 +161,12 @@ export function ConfigPage() {
 
         <aside className="side-stack">
           <section className="panel compact-panel">
-            <span className="section-title">Endpoint Register</span>
+            <span className="section-title">{t('config.endpoints.title')}</span>
             <div className="endpoint-list">
               {endpointCatalog.map((endpoint) => (
                 <div className="endpoint-row compact-endpoint" key={endpoint.id}>
                   <div className="endpoint-body">
-                    <strong>{endpoint.label}</strong>
+                    <strong>{t(endpoint.labelKey)}</strong>
                     <code>{endpoint.url}</code>
                   </div>
                   <span className={`endpoint-method ${endpoint.method.toLowerCase()}`}>

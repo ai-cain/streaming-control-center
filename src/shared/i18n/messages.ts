@@ -1,0 +1,471 @@
+export const defaultLocale = 'en' as const
+export const supportedLocales = ['en', 'es'] as const
+
+export type Locale = (typeof supportedLocales)[number]
+
+const en = {
+  'nav.workspace': 'Workspace',
+  'nav.live': 'Live',
+  'nav.playback': 'Playback',
+  'nav.exports': 'Exports',
+  'nav.snapshots': 'Snapshots',
+  'nav.settings': 'Settings',
+
+  'shell.operatorConsole': 'Operator console',
+  'shell.primaryNavigation': 'Primary navigation',
+  'shell.status.api.ready': 'API ready',
+  'shell.status.api.pending': 'API pending',
+  'shell.status.live.ready': 'Live ready',
+  'shell.status.live.incomplete': 'Live incomplete',
+  'shell.locale.label': 'Language',
+
+  'overview.sectionTitle': 'Workspace',
+  'overview.title': 'Monitoring workspace',
+  'overview.description':
+    'A flatter, cleaner interface inspired by surveillance clients: live view, playback review, clip exports, and connection settings.',
+  'overview.action.openLive': 'Open live',
+  'overview.action.openPlayback': 'Open playback',
+  'overview.summary.recorderHealth.label': 'Recorder Health',
+  'overview.summary.recorderHealth.offline': 'Offline',
+  'overview.summary.recorderHealth.online': 'Online',
+  'overview.summary.recorderHealth.checking': 'Checking',
+  'overview.summary.recorderHealth.polling': 'polling',
+  'overview.summary.workers.label': 'Workers',
+  'overview.summary.workers.note': 'Recorder process count',
+  'overview.summary.activeCameras.label': 'Active Cameras',
+  'overview.summary.activeCameras.note': 'Derived from status',
+  'overview.summary.connectionMode.label': 'Connection Mode',
+  'overview.module.live.section': 'Live',
+  'overview.module.live.title': 'Current signal monitor',
+  'overview.module.live.description':
+    'Dark viewer stage with source context and recorder status.',
+  'overview.module.live.link': 'Go to live',
+  'overview.module.playback.section': 'Playback',
+  'overview.module.playback.title': 'Bottom timeline review',
+  'overview.module.playback.description':
+    'Storyboard frames, scrubber, and range controls designed for review.',
+  'overview.module.playback.link': 'Go to playback',
+  'overview.module.settings.section': 'Settings',
+  'overview.module.settings.title': 'Connection workspace',
+  'overview.module.settings.description':
+    'Recorder API, media origin, stream target, and polling in one page.',
+  'overview.module.settings.link': 'Open settings',
+
+  'config.sectionTitle': 'Settings',
+  'config.title': 'Connection workspace',
+  'config.description':
+    'Configure recorder API, media origin, stream target, and polling. This page stays accessible because the app is mainly GET and POST driven.',
+  'config.network.title': 'Network',
+  'config.network.apiBase.label': 'Recorder API',
+  'config.network.apiBase.placeholder': 'http://host:7000',
+  'config.network.mediaBase.label': 'Media origin',
+  'config.network.mediaBase.placeholder': 'http://host:8000',
+  'config.stream.title': 'Stream',
+  'config.stream.app.label': 'Application',
+  'config.stream.app.placeholder': 'main',
+  'config.stream.streamKey.label': 'Stream key template',
+  'config.stream.streamKey.placeholder': 'camera_{id} or camera_01',
+  'config.stream.streamKey.help':
+    'Leave it blank to use the built-in camera mapping, or use {id} to switch per selected camera.',
+  'config.stream.polling.label': 'Polling',
+  'config.actions.save': 'Save settings',
+  'config.actions.reset': 'Reset',
+  'config.preview.title': 'Current Preview',
+  'config.preview.apiBase': 'Recorder API',
+  'config.preview.mediaBase': 'Media origin',
+  'config.preview.liveManifest': 'Live manifest',
+  'config.preview.browserOrigin': 'Browser origin',
+  'config.preview.notConfigured': 'Not configured',
+  'config.preview.notReadyYet': 'Not ready yet',
+  'config.endpoints.title': 'Endpoint Register',
+
+  'connection.mode.pending': 'pending',
+  'connection.note.pending':
+    'Set the recorder API and media origin first. The new app intentionally avoids dead default links.',
+  'connection.mode.mixedContent': 'mixed content',
+  'connection.note.mixedContent':
+    'The UI is running on HTTPS while one or more targets still use HTTP. Browsers may block fetches, snapshots, or HLS playback.',
+  'connection.mode.localOnly': 'local only',
+  'connection.note.localOnly':
+    'Everything points to localhost. Great for development, but only this machine can reach the services unless a proxy is added.',
+  'connection.mode.privateLan': 'private LAN',
+  'connection.note.privateLan':
+    'The stack is on a private address range. Access depends on LAN or VPN reachability.',
+  'connection.mode.publicEdge': 'public edge',
+  'connection.note.publicEdge':
+    'The stack points to a public IP. Add authentication and network controls if recorder endpoints are reachable from the internet.',
+  'connection.mode.custom': 'custom',
+  'connection.note.custom':
+    'Custom hostnames are in play. Validate DNS, TLS, CORS, and firewall rules as part of rollout.',
+
+  'endpoint.liveManifest': 'Live HLS manifest',
+  'endpoint.health': 'Recorder health',
+  'endpoint.status': 'Recording status',
+  'endpoint.playback': 'Playback range',
+  'endpoint.available': 'Playback availability',
+  'endpoint.exportsCreate': 'Create export job',
+  'endpoint.exportsList': 'List export jobs',
+  'endpoint.snapshotLatest': 'Latest snapshot',
+  'endpoint.snapshotHistory': 'Snapshot history',
+
+  'blueprint.direction': 'Direction',
+  'blueprint.endpoints': 'Endpoints',
+  'blueprint.requestShape': 'Request Shape',
+  'blueprint.nextWork': 'Next Work',
+
+  'exports.eyebrow': 'Export plan',
+  'exports.title': 'Exports become a background jobs surface',
+  'exports.description':
+    'Exports are a perfect POST-plus-polling feature. The UI should feel like a job console, not a single button that fires blind requests.',
+  'exports.direction':
+    'Use a create-job action followed by a job list that refreshes until downloads are ready.',
+  'exports.workstream.1': 'Build a typed export request payload.',
+  'exports.workstream.2': 'Poll job status and display progress history.',
+  'exports.workstream.3':
+    'Expose download readiness clearly when the output file exists.',
+
+  'snapshots.eyebrow': 'Snapshot plan',
+  'snapshots.title': 'Snapshots become an evidence inspector',
+  'snapshots.description':
+    'Snapshots deserve their own evidence-focused module with image rendering, metadata, and recent capture history.',
+  'snapshots.direction':
+    'Keep the endpoint contract, but make the feature visual and inspectable instead of burying it inside a giant dashboard.',
+  'snapshots.workstream.1':
+    'Render the latest image with timestamp and dimensions.',
+  'snapshots.workstream.2':
+    'Show recent snapshot history in a compact timeline.',
+  'snapshots.workstream.3':
+    'Leave room for downloads or evidence workflows later.',
+
+  'resource.monitoring': 'Monitoring',
+  'resource.view.group': 'Group',
+  'resource.view.list': 'List',
+  'resource.search.label': 'Search',
+  'resource.search.placeholder': 'Search camera or group',
+  'resource.openSettings': 'Open settings',
+
+  'live.mode.liveView': 'Live View',
+  'live.mode.playback': 'Playback',
+  'live.layout.1x1': '1×1',
+  'live.layout.1x2': '1×2',
+  'live.layout.2x2': '2×2',
+  'live.pill.signalIssue': 'signal issue',
+  'live.pill.live': 'live',
+  'live.settings': 'Settings',
+  'live.footer.workers': 'Workers',
+  'live.footer.activeCameras': 'Active cameras',
+  'live.footer.mode': 'Mode',
+  'live.footer.inGrid': 'In grid',
+  'live.footer.gridUsage': '{count} / {layout}',
+  'live.endpoints.title': 'Live Endpoints',
+  'live.cameraStrip.title': 'Cameras',
+  'live.slot.selectCamera': 'Select a camera below',
+  'live.slot.removeCamera': 'Remove {camera}',
+  'live.hls.idle': 'Add media base, app, and stream key to start live playback.',
+  'live.hls.loadingManifest': 'Loading HLS manifest...',
+  'live.hls.manifestLoaded':
+    'Manifest loaded. Press play if autoplay is blocked.',
+  'live.hls.playingNative': 'Live playback is using native HLS support.',
+  'live.hls.playingHlsJs': 'Live playback is running through hls.js.',
+  'live.hls.unsupported': 'This browser does not support HLS playback.',
+  'live.hls.fatalError': 'The browser hit a fatal HLS playback error.',
+  'live.hls.runtimeLoadError': 'The hls.js runtime could not be loaded.',
+
+  'playback.selectedCameraPlayback': '{camera} playback',
+  'playback.settings': 'Settings',
+  'playback.field.camera': 'Camera',
+  'playback.field.date': 'Date',
+  'playback.field.from': 'From',
+  'playback.field.to': 'To',
+  'playback.preset.oneHour': '1 hour',
+  'playback.preset.threeHours': '3 hours',
+  'playback.action.loadClip': 'Load clip',
+  'playback.action.loading': 'Loading…',
+  'playback.error.configureApi':
+    'Configure the API base URL in Settings first.',
+  'playback.error.failedToLoadClip': 'Failed to load clip.',
+  'playback.viewer.eyebrow': 'Playback Viewer',
+  'playback.pill.recorded': 'recorded',
+  'playback.screen.badge': 'Playback',
+  'playback.footer.range': 'Range',
+  'playback.footer.selection': 'Selection',
+  'playback.footer.availability': 'Availability',
+  'playback.footer.availabilityValue': 'Continuous segments / 61 min',
+  'playback.footer.marker': 'Marker',
+  'playback.summary.title': 'Clip Summary',
+  'playback.summary.selectedFrame': 'Selected frame',
+  'playback.summary.zone': 'Zone',
+  'playback.summary.comment': 'Comment',
+  'playback.api.title': 'Playback API',
+  'playback.timeline.eyebrow': 'Recorded Timeline',
+  'playback.timeline.title': 'Storyboard and segment review',
+  'playback.timeline.currentPointer': 'Current pointer',
+  'playback.lane.video': 'Video',
+  'playback.lane.motion': 'Motion',
+
+  'playback.zone.gateA': 'Gate A',
+  'playback.zone.southLane': 'South lane',
+  'playback.zone.frontDock': 'Front dock',
+  'playback.zone.northLane': 'North lane',
+  'playback.note.entryMovementDetected': 'Entry movement detected',
+  'playback.note.subjectPausesAtBarrier': 'Subject pauses at barrier',
+  'playback.note.vehicleEntersFrame': 'Vehicle enters frame',
+  'playback.note.crossingZoneHighlighted': 'Crossing zone highlighted',
+  'playback.note.lowActivityInterval': 'Low activity interval',
+  'playback.note.operatorMarkerAdded': 'Operator marker added',
+  'playback.note.motionClusterNearCurb': 'Motion cluster near curb',
+  'playback.note.clipEnd': 'Clip end',
+
+  'camera.site.main': 'Main Site',
+  'camera.camera-1.label': 'CAMERA 1',
+  'camera.camera-1.short': 'Camera 1',
+  'camera.camera-1.stage': 'North view',
+  'camera.camera-2.label': 'CAMERA 2',
+  'camera.camera-2.short': 'Camera 2',
+  'camera.camera-2.stage': 'Main view',
+  'camera.camera-3.label': 'CAMERA 3',
+  'camera.camera-3.short': 'Camera 3',
+  'camera.camera-3.stage': 'South view',
+} as const
+
+export type TranslationKey = keyof typeof en
+type TranslationDictionary = Record<TranslationKey, string>
+
+const es: TranslationDictionary = {
+  'nav.workspace': 'Espacio de trabajo',
+  'nav.live': 'En vivo',
+  'nav.playback': 'Reproducción',
+  'nav.exports': 'Exportaciones',
+  'nav.snapshots': 'Capturas',
+  'nav.settings': 'Configuración',
+
+  'shell.operatorConsole': 'Consola de operador',
+  'shell.primaryNavigation': 'Navegación principal',
+  'shell.status.api.ready': 'API lista',
+  'shell.status.api.pending': 'API pendiente',
+  'shell.status.live.ready': 'En vivo listo',
+  'shell.status.live.incomplete': 'En vivo incompleto',
+  'shell.locale.label': 'Idioma',
+
+  'overview.sectionTitle': 'Espacio de trabajo',
+  'overview.title': 'Espacio de monitoreo',
+  'overview.description':
+    'Una interfaz más limpia y plana inspirada en clientes de videovigilancia: vista en vivo, revisión de reproducción, exportación de clips y configuración de conexión.',
+  'overview.action.openLive': 'Abrir en vivo',
+  'overview.action.openPlayback': 'Abrir reproducción',
+  'overview.summary.recorderHealth.label': 'Salud del recorder',
+  'overview.summary.recorderHealth.offline': 'Fuera de línea',
+  'overview.summary.recorderHealth.online': 'En línea',
+  'overview.summary.recorderHealth.checking': 'Verificando',
+  'overview.summary.recorderHealth.polling': 'consultando',
+  'overview.summary.workers.label': 'Workers',
+  'overview.summary.workers.note': 'Cantidad de procesos del recorder',
+  'overview.summary.activeCameras.label': 'Cámaras activas',
+  'overview.summary.activeCameras.note': 'Derivado del estado',
+  'overview.summary.connectionMode.label': 'Modo de conexión',
+  'overview.module.live.section': 'En vivo',
+  'overview.module.live.title': 'Monitor de señal actual',
+  'overview.module.live.description':
+    'Escenario oscuro del visor con contexto de la fuente y estado del recorder.',
+  'overview.module.live.link': 'Ir a en vivo',
+  'overview.module.playback.section': 'Reproducción',
+  'overview.module.playback.title': 'Revisión con línea de tiempo inferior',
+  'overview.module.playback.description':
+    'Cuadros storyboard, scrubber y controles de rango diseñados para revisión.',
+  'overview.module.playback.link': 'Ir a reproducción',
+  'overview.module.settings.section': 'Configuración',
+  'overview.module.settings.title': 'Espacio de conexión',
+  'overview.module.settings.description':
+    'API del recorder, origen multimedia, destino del stream y polling en una sola página.',
+  'overview.module.settings.link': 'Abrir configuración',
+
+  'config.sectionTitle': 'Configuración',
+  'config.title': 'Espacio de conexión',
+  'config.description':
+    'Configura la API del recorder, el origen multimedia, el destino del stream y el polling. Esta página sigue accesible porque la app depende principalmente de GET y POST.',
+  'config.network.title': 'Red',
+  'config.network.apiBase.label': 'API del recorder',
+  'config.network.apiBase.placeholder': 'http://host:7000',
+  'config.network.mediaBase.label': 'Origen multimedia',
+  'config.network.mediaBase.placeholder': 'http://host:8000',
+  'config.stream.title': 'Stream',
+  'config.stream.app.label': 'Aplicación',
+  'config.stream.app.placeholder': 'main',
+  'config.stream.streamKey.label': 'Plantilla de stream key',
+  'config.stream.streamKey.placeholder': 'camera_{id} o camera_01',
+  'config.stream.streamKey.help':
+    'Déjalo vacío para usar el mapeo integrado de cámaras, o usa {id} para cambiar según la cámara seleccionada.',
+  'config.stream.polling.label': 'Polling',
+  'config.actions.save': 'Guardar configuración',
+  'config.actions.reset': 'Restablecer',
+  'config.preview.title': 'Vista previa actual',
+  'config.preview.apiBase': 'API del recorder',
+  'config.preview.mediaBase': 'Origen multimedia',
+  'config.preview.liveManifest': 'Manifest en vivo',
+  'config.preview.browserOrigin': 'Origen del navegador',
+  'config.preview.notConfigured': 'Sin configurar',
+  'config.preview.notReadyYet': 'Aún no está listo',
+  'config.endpoints.title': 'Registro de endpoints',
+
+  'connection.mode.pending': 'pendiente',
+  'connection.note.pending':
+    'Primero define la API del recorder y el origen multimedia. La nueva app evita intencionalmente enlaces muertos por defecto.',
+  'connection.mode.mixedContent': 'contenido mixto',
+  'connection.note.mixedContent':
+    'La UI corre sobre HTTPS mientras uno o más destinos siguen en HTTP. El navegador puede bloquear fetches, snapshots o reproducción HLS.',
+  'connection.mode.localOnly': 'solo local',
+  'connection.note.localOnly':
+    'Todo apunta a localhost. Excelente para desarrollo, pero solo esta máquina puede alcanzar los servicios salvo que agregues un proxy.',
+  'connection.mode.privateLan': 'LAN privada',
+  'connection.note.privateLan':
+    'El stack está en un rango de direcciones privadas. El acceso depende de la red local o de la conectividad por VPN.',
+  'connection.mode.publicEdge': 'borde público',
+  'connection.note.publicEdge':
+    'El stack apunta a una IP pública. Agrega autenticación y controles de red si los endpoints del recorder son accesibles desde internet.',
+  'connection.mode.custom': 'personalizado',
+  'connection.note.custom':
+    'Hay hostnames personalizados en juego. Valida DNS, TLS, CORS y firewall como parte del despliegue.',
+
+  'endpoint.liveManifest': 'Manifest HLS en vivo',
+  'endpoint.health': 'Salud del recorder',
+  'endpoint.status': 'Estado de grabación',
+  'endpoint.playback': 'Rango de reproducción',
+  'endpoint.available': 'Disponibilidad de reproducción',
+  'endpoint.exportsCreate': 'Crear trabajo de exportación',
+  'endpoint.exportsList': 'Listar trabajos de exportación',
+  'endpoint.snapshotLatest': 'Última captura',
+  'endpoint.snapshotHistory': 'Historial de capturas',
+
+  'blueprint.direction': 'Dirección',
+  'blueprint.endpoints': 'Endpoints',
+  'blueprint.requestShape': 'Forma de la petición',
+  'blueprint.nextWork': 'Siguiente trabajo',
+
+  'exports.eyebrow': 'Plan de exportación',
+  'exports.title': 'Exportaciones como superficie de trabajos en segundo plano',
+  'exports.description':
+    'Las exportaciones son una funcionalidad perfecta de POST más polling. La UI debe sentirse como una consola de trabajos, no como un botón único que dispara solicitudes a ciegas.',
+  'exports.direction':
+    'Usa una acción para crear trabajos seguida por una lista que se refresque hasta que las descargas estén listas.',
+  'exports.workstream.1': 'Construir un payload tipado para la solicitud de exportación.',
+  'exports.workstream.2':
+    'Consultar el estado del trabajo y mostrar el historial de progreso.',
+  'exports.workstream.3':
+    'Exponer claramente cuándo la descarga está lista si el archivo de salida existe.',
+
+  'snapshots.eyebrow': 'Plan de capturas',
+  'snapshots.title': 'Capturas como inspector de evidencia',
+  'snapshots.description':
+    'Las capturas merecen su propio módulo orientado a evidencia, con renderizado de imagen, metadatos e historial reciente.',
+  'snapshots.direction':
+    'Mantén el contrato de endpoints, pero vuelve la funcionalidad visual e inspeccionable en lugar de enterrarla en un dashboard gigante.',
+  'snapshots.workstream.1':
+    'Renderizar la última imagen con timestamp y dimensiones.',
+  'snapshots.workstream.2':
+    'Mostrar el historial reciente de capturas en una línea de tiempo compacta.',
+  'snapshots.workstream.3':
+    'Dejar espacio para descargas o flujos de evidencia más adelante.',
+
+  'resource.monitoring': 'Monitoreo',
+  'resource.view.group': 'Grupo',
+  'resource.view.list': 'Lista',
+  'resource.search.label': 'Buscar',
+  'resource.search.placeholder': 'Buscar cámara o grupo',
+  'resource.openSettings': 'Abrir configuración',
+
+  'live.mode.liveView': 'Vista en vivo',
+  'live.mode.playback': 'Reproducción',
+  'live.layout.1x1': '1×1',
+  'live.layout.1x2': '1×2',
+  'live.layout.2x2': '2×2',
+  'live.pill.signalIssue': 'problema de señal',
+  'live.pill.live': 'en vivo',
+  'live.settings': 'Configuración',
+  'live.footer.workers': 'Workers',
+  'live.footer.activeCameras': 'Cámaras activas',
+  'live.footer.mode': 'Modo',
+  'live.footer.inGrid': 'En grilla',
+  'live.footer.gridUsage': '{count} / {layout}',
+  'live.endpoints.title': 'Endpoints en vivo',
+  'live.cameraStrip.title': 'Cámaras',
+  'live.slot.selectCamera': 'Selecciona una cámara abajo',
+  'live.slot.removeCamera': 'Quitar {camera}',
+  'live.hls.idle':
+    'Agrega el origen multimedia, la app y la stream key para iniciar la reproducción en vivo.',
+  'live.hls.loadingManifest': 'Cargando manifest HLS...',
+  'live.hls.manifestLoaded':
+    'Manifest cargado. Presiona play si el autoplay está bloqueado.',
+  'live.hls.playingNative':
+    'La reproducción en vivo está usando soporte HLS nativo.',
+  'live.hls.playingHlsJs': 'La reproducción en vivo corre mediante hls.js.',
+  'live.hls.unsupported': 'Este navegador no soporta reproducción HLS.',
+  'live.hls.fatalError':
+    'El navegador encontró un error fatal en la reproducción HLS.',
+  'live.hls.runtimeLoadError': 'No se pudo cargar el runtime de hls.js.',
+
+  'playback.selectedCameraPlayback': 'Reproducción de {camera}',
+  'playback.settings': 'Configuración',
+  'playback.field.camera': 'Cámara',
+  'playback.field.date': 'Fecha',
+  'playback.field.from': 'Desde',
+  'playback.field.to': 'Hasta',
+  'playback.preset.oneHour': '1 hora',
+  'playback.preset.threeHours': '3 horas',
+  'playback.action.loadClip': 'Cargar clip',
+  'playback.action.loading': 'Cargando…',
+  'playback.error.configureApi':
+    'Configura primero la URL base de la API en Configuración.',
+  'playback.error.failedToLoadClip': 'No se pudo cargar el clip.',
+  'playback.viewer.eyebrow': 'Visor de reproducción',
+  'playback.pill.recorded': 'grabado',
+  'playback.screen.badge': 'Reproducción',
+  'playback.footer.range': 'Rango',
+  'playback.footer.selection': 'Selección',
+  'playback.footer.availability': 'Disponibilidad',
+  'playback.footer.availabilityValue': 'Segmentos continuos / 61 min',
+  'playback.footer.marker': 'Marcador',
+  'playback.summary.title': 'Resumen del clip',
+  'playback.summary.selectedFrame': 'Frame seleccionado',
+  'playback.summary.zone': 'Zona',
+  'playback.summary.comment': 'Comentario',
+  'playback.api.title': 'API de reproducción',
+  'playback.timeline.eyebrow': 'Línea de tiempo grabada',
+  'playback.timeline.title': 'Storyboard y revisión de segmentos',
+  'playback.timeline.currentPointer': 'Puntero actual',
+  'playback.lane.video': 'Video',
+  'playback.lane.motion': 'Movimiento',
+
+  'playback.zone.gateA': 'Portón A',
+  'playback.zone.southLane': 'Carril sur',
+  'playback.zone.frontDock': 'Muelle frontal',
+  'playback.zone.northLane': 'Carril norte',
+  'playback.note.entryMovementDetected': 'Movimiento de entrada detectado',
+  'playback.note.subjectPausesAtBarrier': 'El sujeto se detiene en la barrera',
+  'playback.note.vehicleEntersFrame': 'Vehículo entra en cuadro',
+  'playback.note.crossingZoneHighlighted': 'Zona de cruce resaltada',
+  'playback.note.lowActivityInterval': 'Intervalo de baja actividad',
+  'playback.note.operatorMarkerAdded': 'Marcador del operador agregado',
+  'playback.note.motionClusterNearCurb': 'Concentración de movimiento cerca del borde',
+  'playback.note.clipEnd': 'Fin del clip',
+
+  'camera.site.main': 'Sitio principal',
+  'camera.camera-1.label': 'CÁMARA 1',
+  'camera.camera-1.short': 'Cámara 1',
+  'camera.camera-1.stage': 'Vista norte',
+  'camera.camera-2.label': 'CÁMARA 2',
+  'camera.camera-2.short': 'Cámara 2',
+  'camera.camera-2.stage': 'Vista principal',
+  'camera.camera-3.label': 'CÁMARA 3',
+  'camera.camera-3.short': 'Cámara 3',
+  'camera.camera-3.stage': 'Vista sur',
+}
+
+export const localeNames: Record<Locale, string> = {
+  en: 'English',
+  es: 'Español',
+}
+
+export const messages: Record<Locale, TranslationDictionary> = {
+  en,
+  es,
+}

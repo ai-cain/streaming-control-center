@@ -1,3 +1,6 @@
+import type { TranslationKey } from './i18n/messages'
+import { useUiPreferences } from '../features/ui-preferences/ui-preferences-context'
+
 interface FeatureBlueprintPageProps {
   eyebrow: string
   title: string
@@ -5,7 +8,7 @@ interface FeatureBlueprintPageProps {
   direction: string
   endpoints: Array<{
     method: 'GET' | 'POST'
-    label: string
+    labelKey: TranslationKey
     url: string
   }>
   requestShape?: string
@@ -23,6 +26,8 @@ export function FeatureBlueprintPage({
   status,
   workstreams,
 }: FeatureBlueprintPageProps) {
+  const { t } = useUiPreferences()
+
   return (
     <div className="page-shell">
       <section className="page-banner compact">
@@ -32,19 +37,22 @@ export function FeatureBlueprintPage({
           <p>{description}</p>
         </div>
         <div className={`signal-box ${status}`}>
-          <span className="signal-label">Direction</span>
+          <span className="signal-label">{t('blueprint.direction')}</span>
           <p>{direction}</p>
         </div>
       </section>
 
       <div className="workspace-grid">
         <section className="panel">
-          <span className="section-title">Endpoints</span>
+          <span className="section-title">{t('blueprint.endpoints')}</span>
           <div className="endpoint-list">
             {endpoints.map((endpoint) => (
-              <div className="endpoint-row compact-endpoint" key={`${endpoint.method}-${endpoint.label}`}>
+              <div
+                className="endpoint-row compact-endpoint"
+                key={`${endpoint.method}-${endpoint.labelKey}`}
+              >
                 <div className="endpoint-body">
-                  <strong>{endpoint.label}</strong>
+                  <strong>{t(endpoint.labelKey)}</strong>
                   <code>{endpoint.url}</code>
                 </div>
                 <span className={`endpoint-method ${endpoint.method.toLowerCase()}`}>
@@ -56,7 +64,9 @@ export function FeatureBlueprintPage({
 
           {requestShape ? (
             <>
-              <span className="section-title section-spacer">Request Shape</span>
+              <span className="section-title section-spacer">
+                {t('blueprint.requestShape')}
+              </span>
               <pre className="code-block">{requestShape}</pre>
             </>
           ) : null}
@@ -64,7 +74,7 @@ export function FeatureBlueprintPage({
 
         <aside className="side-stack">
           <section className="panel compact-panel">
-            <span className="section-title">Next Work</span>
+            <span className="section-title">{t('blueprint.nextWork')}</span>
             <ul className="check-list">
               {workstreams.map((item) => (
                 <li key={item}>{item}</li>
