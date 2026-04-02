@@ -19,7 +19,8 @@ const navItems = [
 
 export function AppShell() {
   const { hasApiConfig, hasLiveConfig } = useConfig()
-  const { locale, localeOptions, setLocale, t } = useUiPreferences()
+  const { locale, localeOptions, setLocale, setTheme, t, theme, themeOptions } =
+    useUiPreferences()
 
   return (
     <div className="shell">
@@ -69,6 +70,19 @@ export function AppShell() {
               {localeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="shell-theme">
+            <span>{t('shell.theme.label')}</span>
+            <select
+              onChange={(event) => setTheme(event.target.value as typeof theme)}
+              value={theme}
+            >
+              {themeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {t(option === 'dark' ? 'theme.dark' : 'theme.light')}
                 </option>
               ))}
             </select>

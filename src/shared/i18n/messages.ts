@@ -18,6 +18,9 @@ const en = {
   'shell.status.live.ready': 'Live ready',
   'shell.status.live.incomplete': 'Live incomplete',
   'shell.locale.label': 'Language',
+  'shell.theme.label': 'Theme',
+  'theme.light': 'Light',
+  'theme.dark': 'Dark',
 
   'overview.sectionTitle': 'Workspace',
   'overview.title': 'Monitoring workspace',
@@ -246,6 +249,9 @@ const es: TranslationDictionary = {
   'shell.status.live.ready': 'En vivo listo',
   'shell.status.live.incomplete': 'En vivo incompleto',
   'shell.locale.label': 'Idioma',
+  'shell.theme.label': 'Tema',
+  'theme.light': 'Claro',
+  'theme.dark': 'Oscuro',
 
   'overview.sectionTitle': 'Espacio de trabajo',
   'overview.title': 'Espacio de monitoreo',
@@ -476,6 +482,9 @@ const zh: TranslationDictionary = {
   'shell.status.live.ready': '实时就绪',
   'shell.status.live.incomplete': '实时未完成',
   'shell.locale.label': '语言',
+  'shell.theme.label': '主题',
+  'theme.light': '浅色',
+  'theme.dark': '深色',
 
   'overview.sectionTitle': '工作区',
   'overview.title': '监控工作区',

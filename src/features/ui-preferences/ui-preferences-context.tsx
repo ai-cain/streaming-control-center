@@ -24,6 +24,11 @@ import {
   uiPreferencesStorageKey,
   type UiPreferences,
 } from './ui-preferences.types'
+import {
+  normalizeTheme,
+  supportedThemes,
+  type Theme,
+} from './theme'
 
 interface UiPreferencesContextValue {
   locale: Locale
@@ -31,7 +36,10 @@ interface UiPreferencesContextValue {
     value: Locale
     label: string
   }>
+  theme: Theme
+  themeOptions: Theme[]
   setLocale: (nextLocale: Locale) => void
+  setTheme: (nextTheme: Theme) => void
   t: TranslateFn
 }
 
@@ -42,6 +50,7 @@ function sanitizeUiPreferences(
 ): UiPreferences {
   return {
     locale: normalizeLocale(input?.locale),
+    theme: normalizeTheme(input?.theme),
   }
 }
 
@@ -89,6 +98,10 @@ export function UiPreferencesProvider({
   }, [preferences.locale])
 
   useEffect(() => {
+    document.documentElement.dataset.theme = preferences.theme
+  }, [preferences.theme])
+
+  useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
       if (event.key === uiPreferencesStorageKey) {
         setPreferences(readStoredUiPreferences())
@@ -109,6 +122,8 @@ export function UiPreferencesProvider({
         value: locale,
         label: localeNames[locale],
       })),
+      theme: preferences.theme,
+      themeOptions: [...supportedThemes],
       setLocale: (nextLocale) =>
         setPreferences((currentPreferences) =>
           sanitizeUiPreferences({
@@ -116,10 +131,17 @@ export function UiPreferencesProvider({
             locale: nextLocale,
           }),
         ),
+      setTheme: (nextTheme) =>
+        setPreferences((currentPreferences) =>
+          sanitizeUiPreferences({
+            ...currentPreferences,
+            theme: nextTheme,
+          }),
+        ),
       t: (key, params: TranslationParams = {}) =>
         translate(preferences.locale, key, params),
     }),
-    [preferences.locale],
+    [preferences.locale, preferences.theme],
   )
 
   return (
