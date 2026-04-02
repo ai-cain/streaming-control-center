@@ -34,23 +34,41 @@ export function OverviewPage() {
 
   return (
     <div className="page-shell">
-      <section className="hero-panel">
+      <section className="hero-panel hero-panel-featured">
         <div className="hero-copy">
-          <span className="eyebrow">Overview</span>
-          <h2>We are treating the old UI as legacy and rebuilding with intent</h2>
+          <span className="eyebrow">Control room</span>
+          <h2>The console is now shaped around camera operations, not debug blocks</h2>
           <p>
-            The old prototype proved the product need, but it also showed the pain:
-            hardcoded links, one giant script, and no clean place to grow features.
+            The center of gravity is shifting toward video review: large media
+            stages, signal context, and faster movement between live, playback,
+            exports, and evidence.
           </p>
+
+          <div className="hero-actions">
+            <Link className="button" to="/live">
+              Open live deck
+            </Link>
+            <Link className="button secondary" to="/playback">
+              Jump to playback lab
+            </Link>
+          </div>
         </div>
 
-        <div className={`callout ${connectionMode.tone}`}>
-          <strong>{connectionMode.mode}</strong>
-          <p>{connectionMode.note}</p>
+        <div className="camera-art-card" aria-hidden="true">
+          <div className="camera-art">
+            <div className="camera-core" />
+            <div className="camera-lens" />
+            <div className="camera-ring" />
+            <div className="camera-ring ring-two" />
+          </div>
+          <div className={`callout ${connectionMode.tone}`}>
+            <strong>{connectionMode.mode}</strong>
+            <p>{connectionMode.note}</p>
+          </div>
         </div>
       </section>
 
-      <section className="metric-grid">
+      <section className="metric-grid metric-grid-wide">
         <article className="metric-card">
           <span className="metric-label">Recorder health</span>
           <span className="metric-value">{healthLabel}</span>
@@ -80,7 +98,33 @@ export function OverviewPage() {
         </article>
       </section>
 
-      <div className="content-grid">
+      <div className="content-grid content-grid-wide">
+        <section className="panel">
+          <span className="eyebrow">Mission lanes</span>
+          <div className="lane-grid">
+            <article className="lane-card">
+              <span className="lane-kicker">01</span>
+              <strong>Live deck</strong>
+              <p>Watch the current stream with cleaner stage hierarchy and signal context.</p>
+              <Link to="/live">View live</Link>
+            </article>
+
+            <article className="lane-card">
+              <span className="lane-kicker">02</span>
+              <strong>Playback lab</strong>
+              <p>Scrub history, inspect frames, and move through time like a real review console.</p>
+              <Link to="/playback">Open playback</Link>
+            </article>
+
+            <article className="lane-card">
+              <span className="lane-kicker">03</span>
+              <strong>Configuration workspace</strong>
+              <p>Set origins and stream targets in one place, then let every module inherit them.</p>
+              <Link to="/config">Edit config</Link>
+            </article>
+          </div>
+        </section>
+
         <section className="panel">
           <span className="eyebrow">Endpoint map</span>
           <div className="endpoint-list">
@@ -100,11 +144,11 @@ export function OverviewPage() {
 
         <aside className="stack">
           <section className="panel">
-            <span className="eyebrow">Immediate direction</span>
+            <span className="eyebrow">Operator context</span>
             <ul className="check-list">
-              <li>Live is now the first real module, not only a plan card.</li>
-              <li>Playback, exports, and snapshots inherit the same config contract.</li>
-              <li>Legacy remains reference only while the React code becomes source of truth.</li>
+              <li>Live already reads real recorder health and status from the shared API layer.</li>
+              <li>Playback is being rebuilt as a visual review surface with timeline interaction.</li>
+              <li>Configuration is now the source of truth for endpoints instead of buried defaults.</li>
             </ul>
           </section>
 
@@ -126,6 +170,10 @@ export function OverviewPage() {
               <div className="detail-row">
                 <span className="muted">Live module</span>
                 <strong>{hasLiveConfig ? 'Ready to validate' : 'Needs config'}</strong>
+              </div>
+              <div className="detail-row">
+                <span className="muted">Browser origin</span>
+                <code>{safeOrigin()}</code>
               </div>
             </div>
           </section>

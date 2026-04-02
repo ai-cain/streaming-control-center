@@ -32,13 +32,13 @@ export function FeatureBlueprintPage({
           <p>{description}</p>
         </div>
 
-        <div className={`callout ${status}`}>
+        <div className={`callout ${status} module-callout`}>
           <strong>Implementation direction</strong>
           <p>{direction}</p>
         </div>
       </section>
 
-      <div className="content-grid">
+      <div className="content-grid content-grid-wide">
         <section className="panel">
           <span className="eyebrow">Endpoint contract</span>
           <div className="endpoint-list">
