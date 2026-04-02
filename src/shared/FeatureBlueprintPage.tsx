@@ -25,25 +25,24 @@ export function FeatureBlueprintPage({
 }: FeatureBlueprintPageProps) {
   return (
     <div className="page-shell">
-      <section className="hero-panel">
-        <div className="hero-copy">
-          <span className="eyebrow">{eyebrow}</span>
+      <section className="page-banner compact">
+        <div>
+          <span className="section-title">{eyebrow}</span>
           <h2>{title}</h2>
           <p>{description}</p>
         </div>
-
-        <div className={`callout ${status} module-callout`}>
-          <strong>Implementation direction</strong>
+        <div className={`signal-box ${status}`}>
+          <span className="signal-label">Direction</span>
           <p>{direction}</p>
         </div>
       </section>
 
-      <div className="content-grid content-grid-wide">
+      <div className="workspace-grid">
         <section className="panel">
-          <span className="eyebrow">Endpoint contract</span>
+          <span className="section-title">Endpoints</span>
           <div className="endpoint-list">
             {endpoints.map((endpoint) => (
-              <div className="endpoint-row" key={`${endpoint.method}-${endpoint.label}`}>
+              <div className="endpoint-row compact-endpoint" key={`${endpoint.method}-${endpoint.label}`}>
                 <div className="endpoint-body">
                   <strong>{endpoint.label}</strong>
                   <code>{endpoint.url}</code>
@@ -57,15 +56,15 @@ export function FeatureBlueprintPage({
 
           {requestShape ? (
             <>
-              <span className="eyebrow spaced-block">Request shape</span>
+              <span className="section-title section-spacer">Request Shape</span>
               <pre className="code-block">{requestShape}</pre>
             </>
           ) : null}
         </section>
 
-        <aside className="stack">
-          <section className="panel">
-            <span className="eyebrow">Workstreams</span>
+        <aside className="side-stack">
+          <section className="panel compact-panel">
+            <span className="section-title">Next Work</span>
             <ul className="check-list">
               {workstreams.map((item) => (
                 <li key={item}>{item}</li>

@@ -5,8 +5,9 @@ and recorder API operations.
 
 ## Current State
 
-This repository now has a React + Vite shell that treats the old static console
-as `legacy/` reference material.
+This repository now has a React + Vite shell shaped like a monitoring client:
+light operator chrome, dark video stages, bottom playback timeline, and a
+dedicated settings workspace for recorder endpoints.
 
 The current rebuild already includes:
 
@@ -15,11 +16,11 @@ The current rebuild already includes:
 - React Query polling
 - live HLS playback inside the new shell
 - endpoint-aware blueprint pages for playback, exports, and snapshots
+- a monitoring layout direction inspired by surveillance clients
 
 ## First Milestones
 
 - create a clean routed shell for the standalone product
-- preserve the old prototype as migration reference
 - replace hardcoded defaults with browser-persisted config
 - wire shared API calls for health, live, playback, exports, and snapshots
 
