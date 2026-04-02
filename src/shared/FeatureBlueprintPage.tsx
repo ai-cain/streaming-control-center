@@ -3,7 +3,13 @@ interface FeatureBlueprintPageProps {
   title: string
   description: string
   direction: string
+  endpoints: Array<{
+    method: 'GET' | 'POST'
+    label: string
+    url: string
+  }>
   requestShape?: string
+  status: 'active' | 'neutral'
   workstreams: string[]
 }
 
@@ -12,7 +18,9 @@ export function FeatureBlueprintPage({
   title,
   description,
   direction,
+  endpoints,
   requestShape,
+  status,
   workstreams,
 }: FeatureBlueprintPageProps) {
   return (
@@ -24,7 +32,7 @@ export function FeatureBlueprintPage({
           <p>{description}</p>
         </div>
 
-        <div className="callout">
+        <div className={`callout ${status}`}>
           <strong>Implementation direction</strong>
           <p>{direction}</p>
         </div>
@@ -32,20 +40,37 @@ export function FeatureBlueprintPage({
 
       <div className="content-grid">
         <section className="panel">
-          <span className="eyebrow">Workstreams</span>
-          <ul className="check-list">
-            {workstreams.map((item) => (
-              <li key={item}>{item}</li>
+          <span className="eyebrow">Endpoint contract</span>
+          <div className="endpoint-list">
+            {endpoints.map((endpoint) => (
+              <div className="endpoint-row" key={`${endpoint.method}-${endpoint.label}`}>
+                <div className="endpoint-body">
+                  <strong>{endpoint.label}</strong>
+                  <code>{endpoint.url}</code>
+                </div>
+                <span className={`endpoint-method ${endpoint.method.toLowerCase()}`}>
+                  {endpoint.method}
+                </span>
+              </div>
             ))}
-          </ul>
+          </div>
+
+          {requestShape ? (
+            <>
+              <span className="eyebrow spaced-block">Request shape</span>
+              <pre className="code-block">{requestShape}</pre>
+            </>
+          ) : null}
         </section>
 
         <aside className="stack">
           <section className="panel">
-            <span className="eyebrow">Request shape</span>
-            <pre className="code-block">
-              {requestShape || 'This module will be wired in the next milestone.'}
-            </pre>
+            <span className="eyebrow">Workstreams</span>
+            <ul className="check-list">
+              {workstreams.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </section>
         </aside>
       </div>

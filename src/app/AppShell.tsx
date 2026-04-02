@@ -1,4 +1,5 @@
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
+import { useConfig } from '../features/config/config-context'
 import { ConfigPage } from '../features/config/ConfigPage'
 import { ExportsPage } from '../features/exports/ExportsPage'
 import { LegacyPage } from '../features/legacy/LegacyPage'
@@ -18,6 +19,8 @@ const navItems = [
 ] as const
 
 export function AppShell() {
+  const { hasApiConfig, hasLiveConfig } = useConfig()
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -53,12 +56,12 @@ export function AppShell() {
           <span className="eyebrow">Build posture</span>
           <div className="detail-list">
             <div className="detail-row">
-              <span className="muted">Legacy console</span>
-              <strong>Preserved as reference</strong>
+              <span className="muted">Recorder API</span>
+              <strong>{hasApiConfig ? 'Configured' : 'Pending'}</strong>
             </div>
             <div className="detail-row">
-              <span className="muted">New platform</span>
-              <strong>Modular React rebuild</strong>
+              <span className="muted">Live source</span>
+              <strong>{hasLiveConfig ? 'Ready' : 'Missing fields'}</strong>
             </div>
           </div>
         </section>
@@ -76,8 +79,12 @@ export function AppShell() {
           </div>
 
           <div className="status-row">
-            <span className="badge success">react shell</span>
-            <span className="badge warning">api wiring next</span>
+            <span className={`badge ${hasApiConfig ? 'success' : 'warning'}`}>
+              API {hasApiConfig ? 'set' : 'pending'}
+            </span>
+            <span className={`badge ${hasLiveConfig ? 'success' : 'warning'}`}>
+              live {hasLiveConfig ? 'ready' : 'incomplete'}
+            </span>
             <span className="badge legacy">legacy kept</span>
           </div>
         </header>
