@@ -1,5 +1,5 @@
 export const defaultLocale = 'en' as const
-export const supportedLocales = ['en', 'es'] as const
+export const supportedLocales = ['en', 'es', 'zh'] as const
 
 export type Locale = (typeof supportedLocales)[number]
 
@@ -460,12 +460,226 @@ const es: TranslationDictionary = {
   'camera.camera-3.stage': 'Vista sur',
 }
 
+const zh: TranslationDictionary = {
+  ...en,
+  'nav.workspace': '工作区',
+  'nav.live': '实时',
+  'nav.playback': '回放',
+  'nav.exports': '导出',
+  'nav.snapshots': '快照',
+  'nav.settings': '设置',
+
+  'shell.operatorConsole': '操作台',
+  'shell.primaryNavigation': '主导航',
+  'shell.status.api.ready': 'API 就绪',
+  'shell.status.api.pending': 'API 待配置',
+  'shell.status.live.ready': '实时就绪',
+  'shell.status.live.incomplete': '实时未完成',
+  'shell.locale.label': '语言',
+
+  'overview.sectionTitle': '工作区',
+  'overview.title': '监控工作区',
+  'overview.description':
+    '受监控客户端启发的更扁平、更清爽的界面：实时查看、回放复核、片段导出和连接设置。',
+  'overview.action.openLive': '打开实时',
+  'overview.action.openPlayback': '打开回放',
+  'overview.summary.recorderHealth.label': '录像服务状态',
+  'overview.summary.recorderHealth.offline': '离线',
+  'overview.summary.recorderHealth.online': '在线',
+  'overview.summary.recorderHealth.checking': '检查中',
+  'overview.summary.recorderHealth.polling': '轮询中',
+  'overview.summary.workers.label': 'Worker 数',
+  'overview.summary.workers.note': '录像进程数量',
+  'overview.summary.activeCameras.label': '活跃摄像头',
+  'overview.summary.activeCameras.note': '根据状态推导',
+  'overview.summary.connectionMode.label': '连接模式',
+  'overview.module.live.section': '实时',
+  'overview.module.live.title': '当前信号监视',
+  'overview.module.live.description': '深色查看舞台，带来源上下文和录像状态。',
+  'overview.module.live.link': '前往实时',
+  'overview.module.playback.section': '回放',
+  'overview.module.playback.title': '底部时间线复核',
+  'overview.module.playback.description':
+    '为复核设计的故事板帧、拖动条和时间范围控件。',
+  'overview.module.playback.link': '前往回放',
+  'overview.module.settings.section': '设置',
+  'overview.module.settings.title': '连接工作区',
+  'overview.module.settings.description':
+    '在一个页面中配置录像 API、媒体源、流目标和轮询。',
+  'overview.module.settings.link': '打开设置',
+
+  'config.sectionTitle': '设置',
+  'config.title': '连接工作区',
+  'config.description':
+    '配置录像 API、媒体源、流目标和轮询。由于应用主要依赖 GET 和 POST，所以这个页面会一直保持可访问。',
+  'config.network.title': '网络',
+  'config.network.apiBase.label': '录像 API',
+  'config.network.mediaBase.label': '媒体源',
+  'config.stream.title': '流',
+  'config.stream.app.label': '应用',
+  'config.stream.streamKey.label': '流 key 模板',
+  'config.stream.streamKey.placeholder': 'camera_{id} 或 camera_01',
+  'config.stream.streamKey.help':
+    '留空可使用内置摄像头映射，或者使用 {id} 根据所选摄像头切换。',
+  'config.stream.polling.label': '轮询',
+  'config.actions.save': '保存设置',
+  'config.actions.reset': '重置',
+  'config.preview.title': '当前预览',
+  'config.preview.apiBase': '录像 API',
+  'config.preview.mediaBase': '媒体源',
+  'config.preview.liveManifest': '实时 manifest',
+  'config.preview.browserOrigin': '浏览器源',
+  'config.preview.notConfigured': '未配置',
+  'config.preview.notReadyYet': '尚未就绪',
+  'config.endpoints.title': '端点清单',
+
+  'connection.mode.pending': '待配置',
+  'connection.note.pending':
+    '请先设置录像 API 和媒体源。新应用有意避免使用失效的默认链接。',
+  'connection.mode.mixedContent': '混合内容',
+  'connection.note.mixedContent':
+    'UI 运行在 HTTPS 上，但一个或多个目标仍然使用 HTTP。浏览器可能会阻止 fetch、快照或 HLS 播放。',
+  'connection.mode.localOnly': '仅本地',
+  'connection.note.localOnly':
+    '所有目标都指向 localhost。非常适合开发，但除非加代理，否则只有这台机器能访问这些服务。',
+  'connection.mode.privateLan': '私有局域网',
+  'connection.note.privateLan':
+    '整套系统位于私有地址范围内。访问依赖于局域网或 VPN 连通性。',
+  'connection.mode.publicEdge': '公网边缘',
+  'connection.note.publicEdge':
+    '整套系统指向公网 IP。如果录像端点可从互联网访问，请增加认证和网络控制。',
+  'connection.mode.custom': '自定义',
+  'connection.note.custom':
+    '当前使用自定义主机名。上线时请验证 DNS、TLS、CORS 和防火墙规则。',
+
+  'endpoint.liveManifest': '实时 HLS manifest',
+  'endpoint.health': '录像服务健康状态',
+  'endpoint.status': '录制状态',
+  'endpoint.playback': '回放范围',
+  'endpoint.available': '回放可用性',
+  'endpoint.exportsCreate': '创建导出任务',
+  'endpoint.exportsList': '导出任务列表',
+  'endpoint.snapshotLatest': '最新快照',
+  'endpoint.snapshotHistory': '快照历史',
+
+  'blueprint.direction': '方向',
+  'blueprint.endpoints': '端点',
+  'blueprint.requestShape': '请求形状',
+  'blueprint.nextWork': '下一步工作',
+
+  'exports.eyebrow': '导出方案',
+  'exports.title': '将导出做成后台任务界面',
+  'exports.description':
+    '导出非常适合用 POST 加轮询来实现。UI 应该像任务控制台，而不是一个盲目发请求的按钮。',
+  'exports.direction':
+    '使用创建任务操作，再配一个会持续刷新直到可下载的任务列表。',
+  'exports.workstream.1': '构建类型安全的导出请求 payload。',
+  'exports.workstream.2': '轮询任务状态并显示进度历史。',
+  'exports.workstream.3': '在输出文件存在时清楚地展示下载已就绪。',
+
+  'snapshots.eyebrow': '快照方案',
+  'snapshots.title': '将快照做成证据检查器',
+  'snapshots.description':
+    '快照应该有自己的证据模块，包含图像渲染、元数据和最近捕获历史。',
+  'snapshots.direction':
+    '保留端点契约，但让功能更可视、更易检查，而不是把它埋进一个巨型仪表盘。',
+  'snapshots.workstream.1': '渲染最新图像并展示时间戳与尺寸。',
+  'snapshots.workstream.2': '以紧凑时间线展示最近快照历史。',
+  'snapshots.workstream.3': '为以后增加下载或证据工作流留出空间。',
+
+  'resource.monitoring': '监控',
+  'resource.view.group': '分组',
+  'resource.view.list': '列表',
+  'resource.search.label': '搜索',
+  'resource.search.placeholder': '搜索摄像头或分组',
+  'resource.openSettings': '打开设置',
+
+  'live.mode.liveView': '实时查看',
+  'live.mode.playback': '回放',
+  'live.pill.signalIssue': '信号异常',
+  'live.pill.live': '实时中',
+  'live.settings': '设置',
+  'live.footer.workers': 'Workers',
+  'live.footer.activeCameras': '活跃摄像头',
+  'live.footer.mode': '模式',
+  'live.footer.inGrid': '网格内',
+  'live.endpoints.title': '实时端点',
+  'live.cameraStrip.title': '摄像头',
+  'live.slot.selectCamera': '请在下方选择摄像头',
+  'live.slot.removeCamera': '移除 {camera}',
+  'live.hls.idle': '请添加媒体源、应用和流 key 以开始实时播放。',
+  'live.hls.loadingManifest': '正在加载 HLS manifest...',
+  'live.hls.manifestLoaded': 'Manifest 已加载。如果自动播放被拦截，请手动点击播放。',
+  'live.hls.playingNative': '实时播放正在使用浏览器原生 HLS 支持。',
+  'live.hls.playingHlsJs': '实时播放正在通过 hls.js 运行。',
+  'live.hls.unsupported': '当前浏览器不支持 HLS 播放。',
+  'live.hls.fatalError': '浏览器遇到了致命的 HLS 播放错误。',
+  'live.hls.runtimeLoadError': '无法加载 hls.js 运行时。',
+
+  'playback.selectedCameraPlayback': '{camera} 回放',
+  'playback.settings': '设置',
+  'playback.field.camera': '摄像头',
+  'playback.field.date': '日期',
+  'playback.field.from': '开始',
+  'playback.field.to': '结束',
+  'playback.preset.oneHour': '1 小时',
+  'playback.preset.threeHours': '3 小时',
+  'playback.action.loadClip': '加载片段',
+  'playback.action.loading': '加载中…',
+  'playback.error.configureApi': '请先在设置中配置 API 基础 URL。',
+  'playback.error.failedToLoadClip': '加载片段失败。',
+  'playback.viewer.eyebrow': '回放查看器',
+  'playback.pill.recorded': '已录制',
+  'playback.screen.badge': '回放',
+  'playback.footer.range': '范围',
+  'playback.footer.selection': '选择',
+  'playback.footer.availability': '可用性',
+  'playback.footer.availabilityValue': '连续片段 / 61 分钟',
+  'playback.footer.marker': '标记',
+  'playback.summary.title': '片段摘要',
+  'playback.summary.selectedFrame': '当前帧',
+  'playback.summary.zone': '区域',
+  'playback.summary.comment': '备注',
+  'playback.api.title': '回放 API',
+  'playback.timeline.eyebrow': '录制时间线',
+  'playback.timeline.title': '故事板与片段复核',
+  'playback.timeline.currentPointer': '当前指针',
+  'playback.lane.video': '视频',
+  'playback.lane.motion': '运动',
+
+  'playback.zone.gateA': 'A 号门',
+  'playback.zone.southLane': '南侧车道',
+  'playback.zone.frontDock': '前方装卸区',
+  'playback.zone.northLane': '北侧车道',
+  'playback.note.entryMovementDetected': '检测到入口移动',
+  'playback.note.subjectPausesAtBarrier': '目标在闸机前停留',
+  'playback.note.vehicleEntersFrame': '车辆进入画面',
+  'playback.note.crossingZoneHighlighted': '已高亮穿越区域',
+  'playback.note.lowActivityInterval': '低活动时段',
+  'playback.note.operatorMarkerAdded': '已添加操作员标记',
+  'playback.note.motionClusterNearCurb': '路缘附近出现运动聚集',
+  'playback.note.clipEnd': '片段结束',
+
+  'camera.site.main': '主站点',
+  'camera.camera-1.label': '摄像头 1',
+  'camera.camera-1.short': '摄像头 1',
+  'camera.camera-1.stage': '北向视图',
+  'camera.camera-2.label': '摄像头 2',
+  'camera.camera-2.short': '摄像头 2',
+  'camera.camera-2.stage': '主视图',
+  'camera.camera-3.label': '摄像头 3',
+  'camera.camera-3.short': '摄像头 3',
+  'camera.camera-3.stage': '南向视图',
+}
+
 export const localeNames: Record<Locale, string> = {
   en: 'English',
   es: 'Español',
+  zh: '简体中文',
 }
 
 export const messages: Record<Locale, TranslationDictionary> = {
   en,
   es,
+  zh,
 }
