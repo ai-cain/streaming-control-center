@@ -3,6 +3,32 @@
 Standalone web console for live monitoring, playback review, exports, snapshots,
 and recorder API operations.
 
+## Screenshots
+
+### Workspace
+
+![Workspace](docs/img/01_workspace.png)
+
+### Live
+
+![Live](docs/img/02_live.png)
+
+### Playback
+
+![Playback](docs/img/03_playback.png)
+
+### Exports
+
+![Exports](docs/img/04_exports.png)
+
+### Snapshots
+
+![Snapshots](docs/img/05_snapshots.png)
+
+### Settings
+
+![Settings](docs/img/06_settings.png)
+
 ## Current State
 
 This repository now has a React + Vite shell shaped like a monitoring client:
