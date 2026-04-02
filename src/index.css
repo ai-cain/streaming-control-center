@@ -59,7 +59,8 @@ a:hover {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -513,7 +514,9 @@ pre {
 
 .resource-search input,
 .form-row input,
-.toolbar-field input {
+.form-row select,
+.toolbar-field input,
+.toolbar-field select {
   width: 100%;
   padding: 11px 12px;
   border: 1px solid var(--line);
@@ -524,7 +527,9 @@ pre {
 
 .resource-search input:focus,
 .form-row input:focus,
-.toolbar-field input:focus {
+.form-row select:focus,
+.toolbar-field input:focus,
+.toolbar-field select:focus {
   outline: none;
   border-color: rgba(255, 91, 87, 0.35);
   box-shadow: 0 0 0 3px rgba(255, 91, 87, 0.08);
@@ -694,6 +699,10 @@ pre {
   line-height: 1.6;
   text-align: center;
   overflow-wrap: anywhere;
+}
+
+.viewer-empty code {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .viewer-footer,
@@ -979,6 +988,12 @@ pre {
 .form-row {
   display: grid;
   gap: 6px;
+}
+
+.field-note {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .check-list {

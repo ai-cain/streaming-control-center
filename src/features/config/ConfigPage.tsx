@@ -90,13 +90,17 @@ export function ConfigPage() {
             />
           </label>
           <label className="form-row">
-            <span>Stream key</span>
+            <span>Stream key template</span>
             <input
               onChange={handleTextField('streamKey')}
-              placeholder="camera_01"
+              placeholder="camera_{id} or camera_01"
               spellCheck="false"
               value={draft.streamKey}
             />
+            <small className="field-note">
+              Leave it blank to use the built-in camera mapping, or use {'{id}'} to
+              switch per selected camera.
+            </small>
           </label>
           <label className="form-row">
             <span>Polling</span>

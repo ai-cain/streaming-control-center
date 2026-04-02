@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, type CSSProperties } from 'react'
 import { CameraResourcePanel } from '../../shared/CameraResourcePanel'
+import { cameraCatalog, getCameraById, getCameraByNumericId } from '../../shared/camera-catalog'
 import { useConfig } from '../config/config-context'
 import { buildEndpointCatalog, pickEndpoints } from '../config/endpoints'
 
@@ -101,7 +102,7 @@ export function PlaybackPage() {
   const { config } = useConfig()
   const endpoints = pickEndpoints(buildEndpointCatalog(config), ['playback', 'available'])
   const [selectedFrameIndex, setSelectedFrameIndex] = useState(3)
-  const [cameraId, setCameraId] = useState('2')
+  const [selectedCameraId, setSelectedCameraId] = useState('camera-2')
   const [from, setFrom] = useState(() => {
     const value = new Date()
     value.setMinutes(0, 0, 0)
@@ -114,6 +115,7 @@ export function PlaybackPage() {
     return toLocalInputValue(value)
   })
 
+  const selectedCamera = getCameraById(selectedCameraId)
   const currentFrame = storyFrames[selectedFrameIndex]
   const playheadPercent =
     storyFrames.length > 1
@@ -136,12 +138,15 @@ export function PlaybackPage() {
 
   return (
     <div className="monitor-page">
-      <CameraResourcePanel selectedCamera="CANCHA 2" />
+      <CameraResourcePanel
+        onSelectCamera={setSelectedCameraId}
+        selectedCameraId={selectedCamera.id}
+      />
 
       <div className="monitor-content">
         <div className="monitor-toolbar">
           <div className="monitor-toolbar-left">
-            <div className="monitor-select">Camera {cameraId} playback</div>
+            <div className="monitor-select">{selectedCamera.shortLabel} playback</div>
             <div className="mode-switch">
               <Link className="mode-tab" to="/live">
                 Live View
@@ -159,11 +164,21 @@ export function PlaybackPage() {
           <div className="toolbar-group">
             <label className="toolbar-field">
               <span>Camera</span>
-              <input
-                onChange={(event) => setCameraId(event.target.value)}
-                type="number"
-                value={cameraId}
-              />
+              <select
+                onChange={(event) => {
+                  const nextCamera = getCameraByNumericId(event.target.value)
+                  if (nextCamera) {
+                    setSelectedCameraId(nextCamera.id)
+                  }
+                }}
+                value={selectedCamera.numericId}
+              >
+                {cameraCatalog.map((camera) => (
+                  <option key={camera.id} value={camera.numericId}>
+                    {camera.shortLabel}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label className="toolbar-field">
@@ -203,7 +218,7 @@ export function PlaybackPage() {
             <div className="stage-toolbar">
               <div>
                 <span className="section-title">Playback Viewer</span>
-                <h3>Camera {cameraId} / {currentFrame.zone}</h3>
+                <h3>{selectedCamera.shortLabel} / {currentFrame.zone}</h3>
               </div>
 
               <div className="stage-toolbar-meta">

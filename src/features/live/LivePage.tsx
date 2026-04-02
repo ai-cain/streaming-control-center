@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useRecorderHealthQuery, useRecordingStatusQuery } from '../../shared/api/queries'
 import { CameraResourcePanel } from '../../shared/CameraResourcePanel'
+import { getCameraById, resolveCameraStreamKey } from '../../shared/camera-catalog'
 import { describeConnectionMode } from '../config/connection-mode'
 import { useConfig } from '../config/config-context'
 import { buildEndpointCatalog, buildLiveManifestUrl, pickEndpoints } from '../config/endpoints'
@@ -9,16 +10,32 @@ import { useHlsPlayer } from './useHlsPlayer'
 
 export function LivePage() {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const { config, hasLiveConfig } = useConfig()
-  const liveManifestUrl = buildLiveManifestUrl(config)
-  const playerState = useHlsPlayer(videoRef, liveManifestUrl, hasLiveConfig)
+  const [selectedCameraId, setSelectedCameraId] = useState('camera-2')
+  const selectedCamera = getCameraById(selectedCameraId)
+  const { config } = useConfig()
+  const selectedStreamKey = useMemo(
+    () => resolveCameraStreamKey(config.streamKey, selectedCamera),
+    [config.streamKey, selectedCamera],
+  )
+  const liveConfig = useMemo(
+    () => ({
+      ...config,
+      streamKey: selectedStreamKey,
+    }),
+    [config, selectedStreamKey],
+  )
+  const hasSelectedLiveConfig = Boolean(
+    liveConfig.mediaBase && liveConfig.app && liveConfig.streamKey,
+  )
+  const liveManifestUrl = buildLiveManifestUrl(liveConfig)
+  const playerState = useHlsPlayer(videoRef, liveManifestUrl, hasSelectedLiveConfig)
   const healthQuery = useRecorderHealthQuery(config.apiBase, config.pollingMs)
   const statusQuery = useRecordingStatusQuery(config.apiBase, config.pollingMs)
   const connectionMode = describeConnectionMode(config)
   const activeCameras = (statusQuery.data ?? []).filter(
     (camera) => camera.is_running,
   ).length
-  const endpoints = pickEndpoints(buildEndpointCatalog(config), [
+  const endpoints = pickEndpoints(buildEndpointCatalog(liveConfig), [
     'live-manifest',
     'health',
     'status',
@@ -26,12 +43,17 @@ export function LivePage() {
 
   return (
     <div className="monitor-page">
-      <CameraResourcePanel selectedCamera="CANCHA 2" />
+      <CameraResourcePanel
+        onSelectCamera={setSelectedCameraId}
+        selectedCameraId={selectedCamera.id}
+      />
 
       <div className="monitor-content">
         <div className="monitor-toolbar">
           <div className="monitor-toolbar-left">
-            <div className="monitor-select">Camera 2 / Main view</div>
+            <div className="monitor-select">
+              {selectedCamera.shortLabel} / {selectedCamera.stageLabel}
+            </div>
             <div className="mode-switch">
               <span className="mode-tab active">Live View</span>
               <Link className="mode-tab" to="/playback">
@@ -49,7 +71,7 @@ export function LivePage() {
           <div className="viewer-toolbar">
             <div>
               <span className="section-title">Live Monitor</span>
-              <h3>{config.streamKey || 'No stream configured'}</h3>
+              <h3>{selectedCamera.label}</h3>
             </div>
 
             <div className="viewer-toolbar-meta">
@@ -61,11 +83,12 @@ export function LivePage() {
           </div>
 
           <div className="viewer-canvas">
-            {hasLiveConfig ? (
+            {hasSelectedLiveConfig ? (
               <video autoPlay controls muted playsInline ref={videoRef} />
             ) : (
               <div className="viewer-empty">
-                Waiting for media origin, application, and stream key.
+                Waiting for media origin and app. The selected camera will use{' '}
+                <code>{selectedStreamKey}</code>.
               </div>
             )}
           </div>
