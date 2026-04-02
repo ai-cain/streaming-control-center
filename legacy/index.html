@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recorder Operations Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <span class="eyebrow">Recorder workspace</span>
+        <h1>Streaming Control Center</h1>
+        <p class="lead">
+          Monitorea el live, consulta playback historico y administra evidencias
+          desde una consola mas clara para operacion y soporte.
+        </p>
+      </div>
+
+      <div class="status-stack">
+        <div class="status-pill">
+          <span id="health-dot" class="status-dot"></span>
+          <div>
+            <span class="status-label">Estado del recorder</span>
+            <strong id="health-txt">Conectando...</strong>
+          </div>
+        </div>
+
+        <div class="status-pill muted">
+          <span class="status-label">Modo de acceso</span>
+          <strong id="connection-mode">Detectando...</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero-grid">
+      <article class="hero-card hero-card-primary">
+        <span class="eyebrow">Conexion actual</span>
+        <h2 id="hero-endpoint">-</h2>
+        <p id="hero-warning">Preparando endpoints...</p>
+      </article>
+
+      <article class="hero-card">
+        <span class="eyebrow">Live target</span>
+        <h3 id="hero-stream">-</h3>
+        <p id="hero-live-origin">-</p>
+      </article>
+
+      <article class="hero-card">
+        <span class="eyebrow">Workers</span>
+        <h3 id="hero-workers">-</h3>
+        <p id="hero-cameras">Sin datos aun</p>
+      </article>
+
+      <article class="hero-card">
+        <span class="eyebrow">Ultima actividad</span>
+        <h3 id="hero-last-sync">-</h3>
+        <p id="hero-page-context">Panel listo para operar</p>
+      </article>
+    </section>
+
+    <nav class="tabs" aria-label="Secciones del recorder">
+      <button class="tab active" data-tab="live" type="button">
+        <span class="tab-icon">01</span>
+        <span>
+          <strong>Live</strong>
+          <small>Monitoreo en tiempo real</small>
+        </span>
+      </button>
+
+      <button class="tab" data-tab="playback" type="button">
+        <span class="tab-icon">02</span>
+        <span>
+          <strong>Playback</strong>
+          <small>Consulta por rango</small>
+        </span>
+      </button>
+
+      <button class="tab" data-tab="export" type="button">
+        <span class="tab-icon">03</span>
+        <span>
+          <strong>Export</strong>
+          <small>MP4 y jobs</small>
+        </span>
+      </button>
+
+      <button class="tab" data-tab="snapshot" type="button">
+        <span class="tab-icon">04</span>
+        <span>
+          <strong>Snapshot</strong>
+          <small>Imagen y historial</small>
+        </span>
+      </button>
+
+      <button class="tab" data-tab="config" type="button">
+        <span class="tab-icon">05</span>
+        <span>
+          <strong>Config</strong>
+          <small>Conexion y endpoints</small>
+        </span>
+      </button>
+    </nav>
+
+    <main class="page-stack">
+      <section id="page-live" class="page active">
+        <div class="page-grid">
+          <article class="card card-media">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Monitoreo en vivo</span>
+                <h2>Live stream</h2>
+                <p>
+                  Verifica la senal HLS directa del origen media y confirma si el
+                  flujo sigue respondiendo.
+                </p>
+              </div>
+
+              <div class="head-actions">
+                <span class="request-method get">GET</span>
+                <button id="btn-live-reload" class="btn btn-secondary btn-inline" type="button">
+                  Recargar live
+                </button>
+              </div>
+            </div>
+
+            <div class="media-frame">
+              <video id="video-live" controls autoplay muted></video>
+            </div>
+
+            <div class="request-box">
+              <div class="request-line">
+                <span class="request-method get">GET</span>
+                <code id="live-request">-</code>
+              </div>
+              <p class="request-note">
+                El player usa el manifest HLS del origen media. Si este endpoint es
+                publico y no tiene auth, cualquier cliente con red puede solicitarlo.
+              </p>
+            </div>
+
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">URL activa</span>
+                <span class="meta-value" id="live-url">-</span>
+              </div>
+
+              <div class="meta-item">
+                <span class="meta-label">Origen media</span>
+                <span class="meta-value" id="live-origin-label">-</span>
+              </div>
+            </div>
+          </article>
+
+          <aside class="sidebar">
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Recorder</span>
+                  <h2>Estado de grabacion</h2>
+                </div>
+
+                <button id="btn-status-refresh" class="btn btn-secondary btn-inline" type="button">
+                  Actualizar
+                </button>
+              </div>
+
+              <div class="request-line request-line-compact">
+                <span class="request-method get">GET</span>
+                <code id="status-request">-</code>
+              </div>
+
+              <div id="status-container" class="status-list">
+                <p class="empty">Cargando estado...</p>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Eventos</span>
+                  <h2>Actividad</h2>
+                </div>
+
+                <button id="btn-clear-log" class="btn btn-ghost btn-inline" type="button">
+                  Limpiar
+                </button>
+              </div>
+
+              <div class="log" id="log"></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="page-playback" class="page">
+        <div class="page-grid">
+          <article class="card card-media">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Playback historico</span>
+                <h2>Video por rango</h2>
+                <p>
+                  Genera una playlist temporal desde el recorder API y reproduce el
+                  tramo solicitado sin salir de la consola.
+                </p>
+              </div>
+
+              <span class="request-method get">GET</span>
+            </div>
+
+            <div class="media-frame">
+              <video id="video-playback" controls></video>
+            </div>
+
+            <div class="request-box">
+              <div class="request-line">
+                <span class="request-method get">GET</span>
+                <code id="playback-request">-</code>
+              </div>
+              <p class="request-note">
+                Primero se consulta al recorder y luego el player abre la playlist
+                `.m3u8` servida desde el mismo API.
+              </p>
+            </div>
+
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Playlist generada</span>
+                <span class="meta-value" id="playback-url">-</span>
+              </div>
+
+              <div class="meta-item">
+                <span class="meta-label">Resumen</span>
+                <span class="meta-value" id="pb-info">Aun no se ha consultado un rango.</span>
+              </div>
+            </div>
+          </article>
+
+          <aside class="sidebar">
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Consulta</span>
+                  <h2>Rango de playback</h2>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Camara ID</span>
+                  <input id="pb-camera" type="number" value="1">
+                </label>
+
+                <label class="field">
+                  <span>Desde</span>
+                  <input id="pb-from" type="datetime-local">
+                </label>
+
+                <label class="field">
+                  <span>Hasta</span>
+                  <input id="pb-to" type="datetime-local">
+                </label>
+              </div>
+
+              <div class="chip-row">
+                <button class="chip-button" type="button" data-range-target="pb" data-minutes="15">15 min</button>
+                <button class="chip-button" type="button" data-range-target="pb" data-minutes="30">30 min</button>
+                <button class="chip-button" type="button" data-range-target="pb" data-minutes="60">1 hora</button>
+                <button class="chip-button" type="button" data-range-target="pb" data-minutes="180">3 horas</button>
+              </div>
+
+              <button id="btn-playback-load" class="btn btn-primary" type="button">
+                Ver grabacion
+              </button>
+            </section>
+
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Disponibilidad</span>
+                  <h2>Horas con video hoy</h2>
+                </div>
+              </div>
+
+              <div class="request-line request-line-compact">
+                <span class="request-method get">GET</span>
+                <code id="available-request">-</code>
+              </div>
+
+              <button id="btn-available" class="btn btn-secondary" type="button">
+                Ver disponibilidad
+              </button>
+              <div id="available-info" class="sub-info">
+                Consulta las horas del dia con segmentos disponibles.
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="page-export" class="page">
+        <div class="page-grid">
+          <article class="card">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Exportacion</span>
+                <h2>Crear MP4</h2>
+                <p>
+                  Lanza un job en background para consolidar segmentos y generar un
+                  archivo descargable.
+                </p>
+              </div>
+
+              <span class="request-method post">POST</span>
+            </div>
+
+            <div class="request-box">
+              <div class="request-line">
+                <span class="request-method post">POST</span>
+                <code id="export-create-request">-</code>
+              </div>
+              <p class="request-note">
+                Esta accion no es GET. Crea un job nuevo en el recorder y luego se
+                monitorea con llamadas GET aparte.
+              </p>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>Camara ID</span>
+                <input id="exp-camera" type="number" value="1">
+              </label>
+
+              <label class="field">
+                <span>Desde</span>
+                <input id="exp-from" type="datetime-local">
+              </label>
+
+              <label class="field">
+                <span>Hasta</span>
+                <input id="exp-to" type="datetime-local">
+              </label>
+            </div>
+
+            <div class="chip-row">
+              <button class="chip-button" type="button" data-range-target="exp" data-minutes="15">15 min</button>
+              <button class="chip-button" type="button" data-range-target="exp" data-minutes="30">30 min</button>
+              <button class="chip-button" type="button" data-range-target="exp" data-minutes="60">1 hora</button>
+              <button class="chip-button" type="button" data-range-target="exp" data-minutes="180">3 horas</button>
+            </div>
+
+            <button id="btn-export-create" class="btn btn-warn" type="button">
+              Generar MP4
+            </button>
+
+            <div id="exp-result" class="notice empty-notice">
+              Aun no se ha creado ningun job.
+            </div>
+          </article>
+
+          <aside class="sidebar">
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Seguimiento</span>
+                  <h2>Jobs de exportacion</h2>
+                </div>
+
+                <button id="btn-exports-refresh" class="btn btn-secondary btn-inline" type="button">
+                  Actualizar
+                </button>
+              </div>
+
+              <div class="request-line request-line-compact">
+                <span class="request-method get">GET</span>
+                <code id="exports-request">-</code>
+              </div>
+
+              <div id="exports-list" class="jobs-list">
+                <p class="empty">Sin jobs cargados todavia.</p>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="page-snapshot" class="page">
+        <div class="page-grid">
+          <article class="card card-media">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Snapshot</span>
+                <h2>Ultima imagen capturada</h2>
+                <p>
+                  Consulta el snapshot mas reciente y valida si la camara esta
+                  entregando evidencia visual util.
+                </p>
+              </div>
+
+              <span class="request-method get">GET</span>
+            </div>
+
+            <div class="media-frame media-frame-image">
+              <img id="snapshot-img" src="" alt="Sin snapshot">
+            </div>
+
+            <div class="request-box">
+              <div class="request-line">
+                <span class="request-method get">GET</span>
+                <code id="snapshot-image-request">-</code>
+              </div>
+              <p class="request-note">
+                La imagen final la sirve el origen media desde `/storage`, no el
+                HTML local.
+              </p>
+            </div>
+
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Detalle del snapshot</span>
+                <span class="meta-value" id="snapshot-info">Aun sin consulta.</span>
+              </div>
+
+              <div class="meta-item">
+                <span class="meta-label">Historial rapido</span>
+                <span class="meta-value" id="snap-history">Consulta pendiente.</span>
+              </div>
+            </div>
+          </article>
+
+          <aside class="sidebar">
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Consulta</span>
+                  <h2>Acciones de snapshot</h2>
+                </div>
+              </div>
+
+              <label class="field">
+                <span>Camara ID</span>
+                <input id="snap-camera" type="number" value="1">
+              </label>
+
+              <div class="request-line request-line-compact">
+                <span class="request-method get">GET</span>
+                <code id="snapshot-request">-</code>
+              </div>
+
+              <button id="btn-snapshot-latest" class="btn btn-primary" type="button">
+                Ver ultimo snapshot
+              </button>
+
+              <div class="request-line request-line-compact">
+                <span class="request-method get">GET</span>
+                <code id="snapshot-history-request">-</code>
+              </div>
+
+              <button id="btn-snapshot-history" class="btn btn-secondary" type="button">
+                Ver historial
+              </button>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="page-config" class="page">
+        <div class="page-grid">
+          <article class="card">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Conexion</span>
+                <h2>Base URLs y stream target</h2>
+                <p>
+                  Define los endpoints exactos. Si hoy estas saliendo por IP publica,
+                  aqui basta con ponerla con su puerto.
+                </p>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <label class="field field-full">
+                <span>Recorder API base URL</span>
+                <input id="api-base" value="http://181.233.26.102:7000" spellcheck="false">
+              </label>
+
+              <label class="field field-full">
+                <span>Media base URL</span>
+                <input id="media-base" value="http://181.233.26.102:8000" spellcheck="false">
+              </label>
+
+              <label class="field">
+                <span>App NMS</span>
+                <input id="nms-app" value="almaperu" spellcheck="false">
+              </label>
+
+              <label class="field">
+                <span>Stream key</span>
+                <input id="stream-key" value="test_cam" spellcheck="false">
+              </label>
+            </div>
+
+            <div class="helper-copy">
+              Ejemplo directo por IP publica:
+              <code>http://181.233.26.102:7000</code> para API y
+              <code>http://181.233.26.102:8000</code> para media.
+            </div>
+
+            <button id="btn-apply-config" class="btn btn-primary" type="button">
+              Guardar y recargar
+            </button>
+          </article>
+
+          <aside class="sidebar">
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Resumen</span>
+                  <h2>Contexto operativo</h2>
+                </div>
+              </div>
+
+              <div class="details-list">
+                <div class="detail-row">
+                  <span class="detail-label">Recorder API</span>
+                  <code id="cfg-api">-</code>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Media base</span>
+                  <code id="cfg-media">-</code>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Live URL</span>
+                  <code id="cfg-live">-</code>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Origin actual</span>
+                  <code id="cfg-origin">-</code>
+                </div>
+
+                <div class="detail-row">
+                  <span class="detail-label">Modo</span>
+                  <code id="cfg-mode">-</code>
+                </div>
+              </div>
+
+              <div class="notice" id="cfg-note">
+                Preparando analisis de conectividad...
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="section-head compact">
+                <div>
+                  <span class="eyebrow">Mapa de endpoints</span>
+                  <h2>GET y POST visibles</h2>
+                </div>
+              </div>
+
+              <div class="endpoint-map">
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-health">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-status">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-playback">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-available">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method post">POST</span>
+                  <code id="map-export-create">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-exports">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-snapshot-latest">-</code>
+                </div>
+                <div class="endpoint-row">
+                  <span class="request-method get">GET</span>
+                  <code id="map-snapshot-history">-</code>
+                </div>
+              </div>
+
+              <ul class="hint-list">
+                <li>
+                  Si abres puertos en tu IP publica, cualquiera con acceso de red
+                  puede consumir estos endpoints si no agregas auth.
+                </li>
+                <li>
+                  CORS no reemplaza seguridad. Solo regula el navegador; no frena a
+                  `curl`, Postman o un backend externo.
+                </li>
+                <li>
+                  Si esta UI corre en `https` y apuntas a `http://IP:puerto`, el
+                  browser puede bloquear la conexion por mixed content.
+                </li>
+              </ul>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
