@@ -20,3 +20,13 @@ export async function fetchRecorderHealth(apiBase: string) {
 export async function fetchRecordingStatus(apiBase: string) {
   return fetchJson<RecordingStatusItem[]>(buildRecordingStatusUrl(apiBase))
 }
+
+export async function fetchPlaybackClip(
+  apiBase: string,
+  cameraId: string,
+  from: string,
+  to: string,
+) {
+  const params = new URLSearchParams({ camera: cameraId, from, to })
+  return fetchJson<unknown>(`${joinUrl(apiBase, '/api/recording/playback')}?${params}`)
+}

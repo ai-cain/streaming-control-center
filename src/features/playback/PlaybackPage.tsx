@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useState, type CSSProperties } from 'react'
 import { CameraResourcePanel } from '../../shared/CameraResourcePanel'
 import { cameraCatalog, getCameraById, getCameraByNumericId } from '../../shared/camera-catalog'
+import { fetchPlaybackClip } from '../../shared/api/recorder-api'
 import { useConfig } from '../config/config-context'
 import { buildEndpointCatalog, pickEndpoints } from '../config/endpoints'
 
@@ -93,27 +94,18 @@ const motionBars = [12, 28, 16, 44, 18, 52, 24, 38, 16, 48, 22, 14, 40, 18, 34, 
 
 const tickLabels = ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00']
 
-function toLocalInputValue(date: Date) {
-  const shifted = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-  return shifted.toISOString().slice(0, 16)
-}
-
 export function PlaybackPage() {
   const { config } = useConfig()
   const endpoints = pickEndpoints(buildEndpointCatalog(config), ['playback', 'available'])
   const [selectedFrameIndex, setSelectedFrameIndex] = useState(3)
   const [selectedCameraId, setSelectedCameraId] = useState('camera-2')
-  const [from, setFrom] = useState(() => {
-    const value = new Date()
-    value.setMinutes(0, 0, 0)
-    return toLocalInputValue(value)
-  })
-  const [to, setTo] = useState(() => {
-    const value = new Date()
-    value.setMinutes(0, 0, 0)
-    value.setHours(value.getHours() + 1)
-    return toLocalInputValue(value)
-  })
+
+  const today = new Date().toISOString().slice(0, 10)
+  const [date, setDate] = useState(today)
+  const [fromTime, setFromTime] = useState('08:00')
+  const [toTime, setToTime] = useState('10:00')
+  const [isLoading, setIsLoading] = useState(false)
+  const [clipError, setClipError] = useState<string | null>(null)
 
   const selectedCamera = getCameraById(selectedCameraId)
   const currentFrame = storyFrames[selectedFrameIndex]
@@ -128,12 +120,34 @@ export function PlaybackPage() {
   } as CSSProperties
 
   const applyPreset = (hours: number) => {
-    const start = new Date()
-    start.setMinutes(0, 0, 0)
-    const end = new Date(start)
-    end.setHours(start.getHours() + hours)
-    setFrom(toLocalInputValue(start))
-    setTo(toLocalInputValue(end))
+    const now = new Date()
+    const startHour = now.getHours()
+    const endHour = Math.min(startHour + hours, 23)
+    setDate(today)
+    setFromTime(`${String(startHour).padStart(2, '0')}:00`)
+    setToTime(`${String(endHour).padStart(2, '0')}:00`)
+  }
+
+  const loadClip = async () => {
+    if (!config.apiBase) {
+      setClipError('Configure the API base URL in Settings first.')
+      return
+    }
+    setIsLoading(true)
+    setClipError(null)
+    try {
+      await fetchPlaybackClip(
+        config.apiBase,
+        selectedCamera.numericId,
+        `${date} ${fromTime}:00`,
+        `${date} ${toTime}:00`,
+      )
+      // TODO: replace mock timeline with API response data
+    } catch (err) {
+      setClipError(err instanceof Error ? err.message : 'Failed to load clip.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -182,33 +196,49 @@ export function PlaybackPage() {
             </label>
 
             <label className="toolbar-field">
+              <span>Date</span>
+              <input
+                max={today}
+                onChange={(event) => setDate(event.target.value)}
+                type="date"
+                value={date}
+              />
+            </label>
+
+            <label className="toolbar-field">
               <span>From</span>
               <input
-                onChange={(event) => setFrom(event.target.value)}
-                type="datetime-local"
-                value={from}
+                onChange={(event) => setFromTime(event.target.value)}
+                type="time"
+                value={fromTime}
               />
             </label>
 
             <label className="toolbar-field">
               <span>To</span>
               <input
-                onChange={(event) => setTo(event.target.value)}
-                type="datetime-local"
-                value={to}
+                onChange={(event) => setToTime(event.target.value)}
+                type="time"
+                value={toTime}
               />
             </label>
           </div>
 
           <div className="toolbar-actions">
+            {clipError && <span className="clip-error">{clipError}</span>}
             <button className="button secondary" onClick={() => applyPreset(1)} type="button">
               1 hour
             </button>
             <button className="button secondary" onClick={() => applyPreset(3)} type="button">
               3 hours
             </button>
-            <button className="button" type="button">
-              Load clip
+            <button
+              className="button"
+              disabled={isLoading}
+              onClick={loadClip}
+              type="button"
+            >
+              {isLoading ? 'Loading…' : 'Load clip'}
             </button>
           </div>
         </section>
@@ -218,7 +248,9 @@ export function PlaybackPage() {
             <div className="stage-toolbar">
               <div>
                 <span className="section-title">Playback Viewer</span>
-                <h3>{selectedCamera.shortLabel} / {currentFrame.zone}</h3>
+                <h3>
+                  {selectedCamera.shortLabel} / {currentFrame.zone}
+                </h3>
               </div>
 
               <div className="stage-toolbar-meta">
@@ -239,7 +271,9 @@ export function PlaybackPage() {
             <div className="stage-footer">
               <div className="stage-footer-field">
                 <span>Range</span>
-                <strong>{from.replace('T', ' ')} to {to.replace('T', ' ')}</strong>
+                <strong>
+                  {date} {fromTime} — {toTime}
+                </strong>
               </div>
               <div className="stage-footer-field">
                 <span>Selection</span>
