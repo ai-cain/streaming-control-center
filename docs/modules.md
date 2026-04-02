@@ -5,12 +5,12 @@
 ```mermaid
 flowchart LR
   App[AppShell]
-  App --> Workspace[/ /]
-  App --> Live[/live]
-  App --> Playback[/playback]
-  App --> Exports[/exports]
-  App --> Snapshots[/snapshots]
-  App --> Settings[/config]
+  App --> Workspace["Workspace route: /"]
+  App --> Live["Live route: /live"]
+  App --> Playback["Playback route: /playback"]
+  App --> Exports["Exports route: /exports"]
+  App --> Snapshots["Snapshots route: /snapshots"]
+  App --> Settings["Settings route: /config"]
 ```
 
 ## Workspace
