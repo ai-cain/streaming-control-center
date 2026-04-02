@@ -687,8 +687,13 @@ pre {
 }
 
 .viewer-empty {
+  width: min(100%, 460px);
+  padding: 0 24px;
   color: rgba(255, 255, 255, 0.74);
   font-size: 1.02rem;
+  line-height: 1.6;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .viewer-footer,
