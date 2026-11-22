@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useState, useRef, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { CameraResourcePanel } from '../../shared/CameraResourcePanel'
 import {
@@ -8,10 +8,12 @@ import {
   getCameraShortLabel,
 } from '../../shared/camera-catalog'
 import { fetchPlaybackClip } from '../../shared/api/recorder-api'
+import { joinUrl } from '../../shared/utils/url'
 import type { TranslationKey } from '../../shared/i18n/messages'
 import { useConfig } from '../config/config-context'
 import { buildEndpointCatalog, pickEndpoints } from '../config/endpoints'
 import { useUiPreferences } from '../ui-preferences/ui-preferences-context'
+import { useHlsPlayer } from '../live/useHlsPlayer'
 
 interface StoryFrame {
   endColor: string
@@ -114,6 +116,10 @@ export function PlaybackPage() {
   const [toTime, setToTime] = useState('10:00')
   const [isLoading, setIsLoading] = useState(false)
   const [clipError, setClipError] = useState<string | null>(null)
+  const [playlistUrl, setPlaylistUrl] = useState<string | null>(null)
+  const [clipInfo, setClipInfo] = useState<{ segments: number; duration: number } | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  useHlsPlayer(videoRef, playlistUrl ?? '', !!playlistUrl)
 
   const selectedCamera = getCameraById(selectedCameraId)
   const selectedCameraShortLabel = getCameraShortLabel(selectedCamera, t)
@@ -148,14 +154,20 @@ export function PlaybackPage() {
     setIsLoading(true)
     setClipError(null)
 
+    setPlaylistUrl(null)
+    setClipInfo(null)
+
     try {
-      await fetchPlaybackClip(
+      const fromIso = new Date(`${date}T${fromTime}:00`).toISOString()
+      const toIso = new Date(`${date}T${toTime}:00`).toISOString()
+      const clip = await fetchPlaybackClip(
         config.apiBase,
         selectedCamera.numericId,
-        `${date} ${fromTime}:00`,
-        `${date} ${toTime}:00`,
+        fromIso,
+        toIso,
       )
-      // TODO: replace mock timeline with API response data
+      setPlaylistUrl(joinUrl(config.apiBase, clip.playlist_url))
+      setClipInfo({ segments: clip.segments_count, duration: clip.total_duration_seconds })
     } catch (err) {
       setClipError(
         err instanceof Error ? err.message : t('playback.error.failedToLoadClip'),
@@ -287,12 +299,25 @@ export function PlaybackPage() {
             </div>
 
             <div className="stage-screen playback-screen" style={stageStyle}>
-              <div className="screen-grid" aria-hidden="true" />
-              <div className="screen-overlay">
-                <span className="screen-badge">{t('playback.screen.badge')}</span>
-                <strong>{currentFrame.time}</strong>
-                <small>{currentNote}</small>
-              </div>
+              {playlistUrl ? (
+                <video
+                  autoPlay
+                  controls
+                  muted
+                  playsInline
+                  ref={videoRef}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
+                />
+              ) : (
+                <>
+                  <div className="screen-grid" aria-hidden="true" />
+                  <div className="screen-overlay">
+                    <span className="screen-badge">{t('playback.screen.badge')}</span>
+                    <strong>{currentFrame.time}</strong>
+                    <small>{currentNote}</small>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="stage-footer">
@@ -308,7 +333,11 @@ export function PlaybackPage() {
               </div>
               <div className="stage-footer-field">
                 <span>{t('playback.footer.availability')}</span>
-                <strong>{t('playback.footer.availabilityValue')}</strong>
+                <strong>
+                  {clipInfo
+                    ? `${clipInfo.segments} segs / ${Math.round(clipInfo.duration / 60)} min`
+                    : t('playback.footer.availabilityValue')}
+                </strong>
               </div>
               <div className="stage-footer-field">
                 <span>{t('playback.footer.marker')}</span>

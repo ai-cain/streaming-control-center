@@ -7,9 +7,9 @@ export interface AppConfig {
 }
 
 export const defaultConfig: AppConfig = {
-  apiBase: '',
-  mediaBase: '',
-  app: '',
+  apiBase: 'https://backend.smartechlatam.online:1443',
+  mediaBase: 'https://live.smartechlatam.online:1443',
+  app: 'almaperu',
   streamKey: '',
   pollingMs: 10000,
 }
